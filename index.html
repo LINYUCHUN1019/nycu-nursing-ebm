@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NYCU 陽明交大護理碩士｜每日實證醫學英文文獻讀題與翻譯訓練工作坊 (v5.0 GitHub 獨立版)</title>
+  <title>NYCU 陽明交大護理碩士｜每日實證醫學英文文獻讀題與翻譯訓練工作坊 (v6.0 雲端同步穩定版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap');
     body {
@@ -37,13 +36,10 @@
       padding: 0;
       cursor: text;
     }
-    /* 3D Flashcard Flip */
     .perspective-1000 { perspective: 1000px; }
     .transform-style-3d { transform-style: preserve-3d; }
     .backface-hidden { backface-visibility: hidden; }
     .rotate-y-180 { transform: rotateY(180deg); }
-    
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 7px; height: 7px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -56,21 +52,25 @@
   <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="bg-sky-500/20 border border-sky-400/40 p-2 rounded-xl text-sky-300">
-          <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+        <div class="bg-sky-500/20 border border-sky-400/40 p-2 rounded-xl text-sky-300 font-bold text-lg">
+          🎓
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">NYCU 護理碩士｜實證醫學英文讀題翻譯工作坊</h1>
-            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">v5.0 GitHub 獨立版</span>
+            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">v6.0 雲端同步穩定版</span>
           </div>
-          <p class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+          <p class="text-xs text-slate-400 flex flex-wrap items-center gap-2 mt-0.5">
             <span>考生：<strong id="headerUserName" class="text-sky-300">未設定姓名</strong></span>
             <span>•</span>
             <span>連續訓練：<strong id="streakCount" class="text-amber-300">0</strong> 天</span>
             <span>•</span>
             <span id="apiStatusBadge" class="inline-flex items-center gap-1 text-amber-300 cursor-pointer hover:underline" onclick="openSettingsModal()">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span> 未設定 API Key
+              ● 點此設定 API Key
+            </span>
+            <span>•</span>
+            <span id="syncStatusBadge" class="inline-flex items-center gap-1 text-slate-300 cursor-pointer hover:underline" onclick="openSettingsModal()">
+              ☁️ 本機儲存模式
             </span>
           </p>
         </div>
@@ -78,20 +78,23 @@
 
       <!-- Navigation Tabs & Action Buttons -->
       <div class="flex flex-wrap items-center gap-2">
-        <button onclick="switchMainTab('practice')" id="tab-practice" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white flex items-center gap-1.5 transition">
-          <i data-lucide="book-open" class="w-4 h-4"></i> 今日實證訓練
+        <button type="button" onclick="switchMainTab('practice')" id="tab-practice" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white transition">
+          📖 今日實證訓練
         </button>
-        <button onclick="switchMainTab('history')" id="tab-history" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
-          <i data-lucide="history" class="w-4 h-4"></i> 歷史作答庫 <span id="historyCountBadge" class="text-xs bg-slate-700 px-1.5 py-0.2 rounded-full">0</span>
+        <button type="button" onclick="switchMainTab('history')" id="tab-history" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition">
+          🗂️ 歷史作答庫 <span id="historyCountBadge" class="text-xs bg-slate-700 px-1.5 py-0.5 rounded-full">0</span>
         </button>
-        <button onclick="switchMainTab('weekly')" id="tab-weekly" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
-          <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 每週診斷報告
+        <button type="button" onclick="switchMainTab('weekly')" id="tab-weekly" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition">
+          📊 每週診斷報告
         </button>
-        <button onclick="switchMainTab('vocab')" id="tab-vocab" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
-          <i data-lucide="languages" class="w-4 h-4"></i> 我的單字本 <span id="dueVocabBadge" class="text-xs bg-rose-500 text-white px-1.5 py-0.2 rounded-full">0</span>
+        <button type="button" onclick="switchMainTab('vocab')" id="tab-vocab" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition">
+          🔤 我的單字本 <span id="dueVocabBadge" class="text-xs bg-rose-500 text-white px-1.5 py-0.5 rounded-full">0</span>
         </button>
-        <button onclick="openSettingsModal()" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 flex items-center gap-1.5 transition" title="API Key 與讀書會戰友匯出/匯入設定">
-          <i data-lucide="settings" class="w-4 h-4"></i> 設定 / 戰友共享
+        <button type="button" onclick="syncWithCloud(true)" id="btnQuickSync" class="hidden px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-700 hover:bg-emerald-600 text-white transition" title="立即與 Google Sheets 雲端資料庫雙向同步">
+          🔄 立即同步
+        </button>
+        <button type="button" onclick="openSettingsModal()" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 transition">
+          ⚙️ 設定 / 雲端同步
         </button>
       </div>
     </div>
@@ -100,11 +103,11 @@
   <!-- Floating Text Selection Toolbar for Instant Vocab Capture -->
   <div id="selectionToolbar" class="hidden fixed z-50 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-700 px-2.5 py-1.5 flex items-center gap-2 text-xs transform -translate-x-1/2">
     <span id="selectedWordPreview" class="font-semibold text-sky-300 max-w-[140px] truncate px-1"></span>
-    <button onclick="quickSaveSelection(false)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition">
-      <i data-lucide="bookmark-plus" class="w-3.5 h-3.5"></i> 直接收藏
+    <button type="button" onclick="quickSaveSelection(false)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-lg font-medium transition">
+      🔖 直接收藏
     </button>
-    <button onclick="quickSaveSelection(true)" class="bg-sky-600 hover:bg-sky-500 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition">
-      <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI 查詢並收藏
+    <button type="button" onclick="quickSaveSelection(true)" class="bg-sky-600 hover:bg-sky-500 px-2.5 py-1 rounded-lg font-medium transition">
+      ✨ AI 查詢並收藏
     </button>
   </div>
 
@@ -117,9 +120,9 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2.5">
           <select id="articleSelector" onchange="loadSelectedBuiltIn(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none max-w-xs sm:max-w-md">
-            <option value="0">內建題庫 1｜ICU 早期下床活動與呼吸器脫離 (Lancet Respir Med, 2024)</option>
-            <option value="1">內建題庫 2｜慢性傷口銀離子敷料與生物膜清除系統性回顧 (Cochrane, 2025)</option>
-            <option value="2">內建題庫 3｜高齡急重症譫妄預防之非藥物組合式照護 (JAMA Intern Med, 2023)</option>
+            <option value="builtin_0">內建題庫 1｜ICU 早期下床活動與呼吸器脫離 (Lancet Respir Med, 2024)</option>
+            <option value="builtin_1">內建題庫 2｜慢性傷口銀離子敷料與生物膜清除系統性回顧 (Cochrane, 2025)</option>
+            <option value="builtin_2">內建題庫 3｜高齡急重症譫妄預防之非藥物組合式照護 (JAMA Intern Med, 2023)</option>
           </select>
 
           <select id="aiTopicSelect" class="bg-sky-50 border border-sky-200 text-sky-900 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
@@ -130,17 +133,17 @@
             <option value="Evidence-Based Nursing & Patient Safety">主題：實證護理與病人安全</option>
           </select>
 
-          <button onclick="generateNewArticleAI()" id="btnGenerateAI" class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm flex items-center gap-1.5 transition">
-            <i data-lucide="sparkles" class="w-4 h-4"></i> AI 生成今日新文獻 (全文)
+          <button type="button" onclick="generateNewArticleAI()" id="btnGenerateAI" class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition">
+            ✨ AI 生成今日新文獻 (全文)
           </button>
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="toggleHints()" id="btnToggleHints" class="px-3 py-2 rounded-xl text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 flex items-center gap-1.5 transition">
-            <i data-lucide="eye" class="w-4 h-4"></i> 術語提示：開啟
+          <button type="button" onclick="toggleHints()" id="btnToggleHints" class="px-3 py-2 rounded-xl text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
+            👁️ 術語提示：開啟
           </button>
-          <button onclick="toggleLayoutMode()" id="btnLayoutMode" class="hidden lg:flex px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 items-center gap-1.5 transition">
-            <i data-lucide="columns" class="w-4 h-4"></i> 左右並排對照
+          <button type="button" onclick="toggleLayoutMode()" id="btnLayoutMode" class="hidden lg:inline-flex px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
+            ◫ 左右並排對照
           </button>
         </div>
       </div>
@@ -148,9 +151,7 @@
       <!-- Term Popover Banner -->
       <div id="termHelperBox" class="hidden bg-sky-900 text-white rounded-xl p-3.5 shadow-lg flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-start gap-3">
-          <div class="bg-sky-500/30 p-2 rounded-lg mt-0.5">
-            <i data-lucide="book-marked" class="w-4 h-4 text-sky-300"></i>
-          </div>
+          <div class="bg-sky-500/30 px-2.5 py-1.5 rounded-lg text-sm">📘</div>
           <div>
             <div class="flex items-center gap-2">
               <span id="termHelperWord" class="font-bold text-base text-sky-200"></span>
@@ -160,14 +161,14 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="speakCurrentTerm()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium flex items-center gap-1">
-            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 發音
+          <button type="button" onclick="speakCurrentTerm()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium">
+            🔊 發音
           </button>
-          <button onclick="addCurrentTermToVocab()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold flex items-center gap-1">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i> + 收入我的生字本
+          <button type="button" onclick="addCurrentTermToVocab()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold">
+            + 收入我的生字本
           </button>
-          <button onclick="document.getElementById('termHelperBox').classList.add('hidden')" class="p-1.5 text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-4 h-4"></i>
+          <button type="button" onclick="document.getElementById('termHelperBox').classList.add('hidden')" class="px-2 py-1 text-slate-300 hover:text-white font-bold">
+            ✕
           </button>
         </div>
       </div>
@@ -191,12 +192,12 @@
             <!-- Section Filter Pills -->
             <div class="flex flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-200/80">
               <span class="text-xs font-semibold text-slate-500 mr-1">章節檢視：</span>
-              <button onclick="filterSection('all')" class="sec-pill active px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-white" data-sec="all">全部全文</button>
-              <button onclick="filterSection('abstract')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="abstract">Abstract</button>
-              <button onclick="filterSection('introduction')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="introduction">1. Introduction</button>
-              <button onclick="filterSection('methods')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="methods">2. Methods</button>
-              <button onclick="filterSection('results')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="results">3. Results</button>
-              <button onclick="filterSection('discussion')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="discussion">4. Discussion</button>
+              <button type="button" onclick="filterSection('all')" class="sec-pill active px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-white" data-sec="all">全部全文</button>
+              <button type="button" onclick="filterSection('abstract')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="abstract">Abstract</button>
+              <button type="button" onclick="filterSection('introduction')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="introduction">1. Introduction</button>
+              <button type="button" onclick="filterSection('methods')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="methods">2. Methods</button>
+              <button type="button" onclick="filterSection('results')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="results">3. Results</button>
+              <button type="button" onclick="filterSection('discussion')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="discussion">4. Discussion</button>
             </div>
           </div>
 
@@ -204,8 +205,8 @@
           <div id="articleBody" class="p-6 space-y-5 academic-text text-[15.5px] text-slate-800 max-h-[75vh] overflow-y-auto">
             <!-- Rendered dynamically -->
           </div>
-          <div class="bg-slate-50 border-t border-slate-200 px-5 py-2.5 text-xs text-slate-500 flex items-center justify-between">
-            <span>💡 提示：用滑鼠反白選取任何不會的英文單字，即可一鍵收藏或呼叫 AI 查詢釋義。</span>
+          <div class="bg-slate-50 border-t border-slate-200 px-5 py-2.5 text-xs text-slate-500">
+            💡 提示：用滑鼠反白選取任何不會的英文單字，即可一鍵收藏或呼叫 AI 查詢釋義。
           </div>
         </div>
 
@@ -213,12 +214,10 @@
         <div id="answerColumn" class="lg:col-span-6 space-y-5">
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-              <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                <i data-lucide="pen-tool" class="w-4 h-4 text-sky-600"></i> 第一部分：學術英文中譯作答區
-              </h3>
+              <h3 class="font-bold text-slate-900">✍️ 第一部分：學術英文中譯作答區</h3>
               <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
-                <button onclick="setTransMode('section')" id="btnTransSection" class="px-2.5 py-1 rounded-lg bg-white text-sky-700 shadow-sm transition">逐段分章節翻譯</button>
-                <button onclick="setTransMode('full')" id="btnTransFull" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">整篇全文作答框</button>
+                <button type="button" onclick="setTransMode('section')" id="btnTransSection" class="px-2.5 py-1 rounded-lg bg-white text-sky-700 shadow-sm transition">逐段分章節翻譯</button>
+                <button type="button" onclick="setTransMode('full')" id="btnTransFull" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">整篇全文作答框</button>
               </div>
             </div>
 
@@ -255,8 +254,8 @@
 
           <!-- Part 2: NYCU Graduate Exam Critical Appraisal Questions -->
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <i data-lucide="file-question" class="w-4 h-4 text-indigo-600"></i> 第二部分：陽明交大護理碩士考題（實證評讀與臨床應用）
+            <h3 class="font-bold text-slate-900 border-b border-slate-100 pb-3">
+              📝 第二部分：陽明交大護理碩士考題（實證評讀與臨床應用）
             </h3>
 
             <div>
@@ -275,11 +274,11 @@
             </div>
 
             <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
-              <button onclick="clearCurrentAnswers()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+              <button type="button" onclick="clearCurrentAnswers()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
                 清空作答區
               </button>
-              <button onclick="submitForGrading()" id="btnSubmitGrade" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md flex items-center justify-center gap-2 transition">
-                <i data-lucide="check-circle-2" class="w-4 h-4"></i> 送出 AI 教授批改並存檔
+              <button type="button" onclick="submitForGrading()" id="btnSubmitGrade" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition">
+                ✅ 送出 AI 教授批改並雲端存檔
               </button>
             </div>
           </div>
@@ -322,17 +321,13 @@
 
               <!-- Detailed Critique -->
               <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 space-y-2">
-                <h4 class="text-sm font-bold text-amber-900 flex items-center gap-1.5">
-                  <i data-lucide="message-square-warning" class="w-4 h-4 text-amber-600"></i> 漏譯／誤譯核對與考題指導建議
-                </h4>
+                <h4 class="text-sm font-bold text-amber-900">📌 漏譯／誤譯核對與考題指導建議</h4>
                 <div id="gradeFeedbackText" class="text-sm text-slate-800 leading-relaxed whitespace-pre-line"></div>
               </div>
 
               <!-- Paragraph-by-Paragraph Bilingual Reference -->
               <div class="space-y-3">
-                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                  <i data-lucide="split-square-horizontal" class="w-4 h-4 text-sky-600"></i> 逐段中英對照參考譯文與考題解析
-                </h4>
+                <h4 class="text-sm font-bold text-slate-900">📑 逐段中英對照參考譯文與考題解析</h4>
                 <div id="bilingualReferenceList" class="space-y-3"></div>
               </div>
             </div>
@@ -346,7 +341,7 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 class="text-lg font-bold text-slate-900">歷史作答與雙欄重溫檢閱中心</h2>
-          <p class="text-xs text-slate-500 mt-0.5">所有作答皆自動永久保存於本機瀏覽器，支援點開重溫對照與一鍵重新挑戰（Re-attempt）。</p>
+          <p class="text-xs text-slate-500 mt-0.5">支援本機與 Google Sheets 雲端跨裝置同步，可隨時點開重溫對照與重新挑戰（Re-attempt）。</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <select id="historyFilterScore" onchange="renderHistoryList()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold">
@@ -360,7 +355,7 @@
 
       <div id="historyListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
-      <!-- Dual-Column History Detail Modal/Drawer -->
+      <!-- Dual-Column History Detail Drawer -->
       <div id="historyDetailPanel" class="hidden bg-white rounded-2xl shadow-lg border-2 border-sky-500/40 p-6 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
@@ -368,10 +363,10 @@
             <h3 id="histDetailTitle" class="text-lg font-bold text-slate-900 mt-2"></h3>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="reattemptCurrentHistory()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
-              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新作答此篇 (計算進步分差)
+            <button type="button" onclick="reattemptCurrentHistory()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-sm transition">
+              🔄 重新作答此篇 (計算進步分差)
             </button>
-            <button onclick="document.getElementById('historyDetailPanel').classList.add('hidden')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
+            <button type="button" onclick="document.getElementById('historyDetailPanel').classList.add('hidden')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
               關閉檢視
             </button>
           </div>
@@ -386,10 +381,10 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 class="text-lg font-bold text-slate-900">每週學習診斷與 AI 改善處方箋</h2>
-          <p class="text-xs text-slate-500 mt-0.5">彙整近 7 日練習數據、三大核心指標雷達分析與高頻弱點標籤。</p>
+          <p class="text-xs text-slate-500 mt-0.5">彙整近 7 日練習數據、三大核心指標平均表現與高頻弱點標籤。</p>
         </div>
-        <button onclick="generateWeeklyPrescription()" id="btnGenWeekly" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
-          <i data-lucide="stethoscope" class="w-4 h-4"></i> 生成本週 AI 改善處方箋
+        <button type="button" onclick="generateWeeklyPrescription()" id="btnGenWeekly" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition">
+          🩺 生成本週 AI 改善處方箋
         </button>
       </div>
 
@@ -455,9 +450,7 @@
 
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5 mb-3">
-              <i data-lucide="file-check-2" class="w-4 h-4 text-indigo-600"></i> AI 指導教授本週訓練處方箋
-            </h3>
+            <h3 class="font-bold text-slate-900 text-sm mb-3">📋 AI 指導教授本週訓練處方箋</h3>
             <div id="weeklyPrescriptionBox" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-line min-h-[180px]">
               點擊右上方「生成本週 AI 改善處方箋」，系統將根據您近期的翻譯錯誤與弱點標籤，客製化下週讀書計畫。
             </div>
@@ -473,12 +466,12 @@
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-lg font-bold text-slate-900">我的醫學實證單字庫與間隔重複複習</h2>
-            <p class="text-xs text-slate-500 mt-0.5">支援閱讀時反白即時收錄、美式語音朗讀、3D 翻卡記憶與四選一隨堂測驗。</p>
+            <p class="text-xs text-slate-500 mt-0.5">支援閱讀時反白即時收錄、美式語音朗讀、3D 翻卡記憶與四選一隨堂測驗（支援雲端同步）。</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="setVocabSubMode('list')" id="vmode-list" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition">單字庫清單</button>
-            <button onclick="setVocabSubMode('flashcard')" id="vmode-flashcard" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">3D 翻卡複習</button>
-            <button onclick="setVocabSubMode('quiz')" id="vmode-quiz" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">四選一隨堂測驗</button>
+            <button type="button" onclick="setVocabSubMode('list')" id="vmode-list" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition">單字庫清單</button>
+            <button type="button" onclick="setVocabSubMode('flashcard')" id="vmode-flashcard" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">3D 翻卡複習</button>
+            <button type="button" onclick="setVocabSubMode('quiz')" id="vmode-quiz" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">四選一隨堂測驗</button>
           </div>
         </div>
 
@@ -486,8 +479,8 @@
         <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
           <input type="text" id="newVocabWord" placeholder="輸入不會的英文單字或片語 (例如: propensity score matching)" class="flex-1 min-w-[220px] bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
           <input type="text" id="newVocabManualDef" placeholder="中文釋義 (留空則由 AI 自動補全)" class="flex-1 min-w-[200px] bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
-          <button onclick="manualAddVocab()" id="btnAddVocab" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 transition">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i> 新增 / AI 補全釋義
+          <button type="button" onclick="manualAddVocab()" id="btnAddVocab" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition">
+            + 新增 / AI 補全釋義
           </button>
         </div>
       </div>
@@ -495,10 +488,10 @@
       <!-- Sub-View A: Vocab List -->
       <div id="vocab-sub-list" class="space-y-4">
         <div class="flex flex-wrap items-center gap-2">
-          <button onclick="filterVocabList('all')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white" data-vf="all">全部單字</button>
-          <button onclick="filterVocabList('due')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="due">今日待複習</button>
-          <button onclick="filterVocabList('learning')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="learning">待加強</button>
-          <button onclick="filterVocabList('mastered')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="mastered">已精熟</button>
+          <button type="button" onclick="filterVocabList('all')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white" data-vf="all">全部單字</button>
+          <button type="button" onclick="filterVocabList('due')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="due">今日待複習</button>
+          <button type="button" onclick="filterVocabList('learning')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="learning">待加強</button>
+          <button type="button" onclick="filterVocabList('mastered')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="mastered">已精熟</button>
         </div>
         <div id="vocabGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </div>
@@ -514,8 +507,8 @@
             <div class="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-md border-2 border-sky-200 p-8 flex flex-col items-center justify-center text-center">
               <span id="fcPosBadge" class="text-xs font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full mb-3">term</span>
               <h3 id="fcFrontWord" class="text-2xl sm:text-3xl font-extrabold text-slate-900">尚無單字</h3>
-              <button onclick="event.stopPropagation(); speakText(document.getElementById('fcFrontWord').innerText)" class="mt-4 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 flex items-center gap-1">
-                <i data-lucide="volume-2" class="w-4 h-4 text-sky-600"></i> 美式發音
+              <button type="button" onclick="event.stopPropagation(); speakText(document.getElementById('fcFrontWord').innerText)" class="mt-4 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
+                🔊 美式發音
               </button>
             </div>
             <!-- Back -->
@@ -531,9 +524,9 @@
           </div>
         </div>
         <div class="grid grid-cols-3 gap-3">
-          <button onclick="rateFlashcard('hard')" class="py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold">不熟 (今日重練)</button>
-          <button onclick="rateFlashcard('good')" class="py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold">有印象 (明日複習)</button>
-          <button onclick="rateFlashcard('easy')" class="py-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold">已精熟 (+4 天)</button>
+          <button type="button" onclick="rateFlashcard('hard')" class="py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold">不熟 (今日重練)</button>
+          <button type="button" onclick="rateFlashcard('good')" class="py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold">有印象 (明日複習)</button>
+          <button type="button" onclick="rateFlashcard('easy')" class="py-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold">已精熟 (+4 天)</button>
         </div>
       </div>
 
@@ -550,75 +543,81 @@
           </div>
           <div id="quizOptions" class="space-y-2.5"></div>
           <div id="quizFeedback" class="hidden text-center text-xs font-bold py-2 rounded-xl"></div>
-          <button onclick="nextQuizQuestion()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">下一題</button>
+          <button type="button" onclick="nextQuizQuestion()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">下一題</button>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ==================== SETTINGS & STUDY GROUP SHARE MODAL ==================== -->
+  <!-- ==================== SETTINGS & CLOUD SYNC MODAL ==================== -->
   <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
       <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
-        <h3 class="font-bold text-base flex items-center gap-2">
-          <i data-lucide="settings" class="w-4 h-4 text-sky-400"></i> 系統設定與讀書會戰友共享中心
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <h3 class="font-bold text-base">⚙️ 系統設定、Google Sheets 雲端同步與戰友分享</h3>
+        <button type="button" onclick="closeSettingsModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
       </div>
 
       <div class="p-5 space-y-5 max-h-[82vh] overflow-y-auto">
         <!-- 1. User Profile -->
-        <div class="space-y-2">
-          <label class="block text-xs font-bold text-slate-800">1. 考生顯示名稱（用於戰友進度檔標記）</label>
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-800">1. 考生顯示名稱（跨裝置與讀書會同步識別）</label>
           <input type="text" id="inputUserName" placeholder="例如：林育群 / 戰友A" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
         </div>
 
         <!-- 2. Gemini API Key -->
-        <div class="space-y-2 pt-3 border-t border-slate-100">
+        <div class="space-y-1.5 pt-3 border-t border-slate-100">
           <div class="flex items-center justify-between">
-            <label class="block text-xs font-bold text-slate-800">2. 個人 Gemini API Key（僅安全儲存於您的瀏覽器本機）</label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-xs text-sky-600 hover:underline font-semibold flex items-center gap-0.5">
-              免費申請 Key <i data-lucide="external-link" class="w-3 h-3"></i>
+            <label class="block text-xs font-bold text-slate-800">2. 個人 Gemini API Key（僅安全儲存於本機瀏覽器）</label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-xs text-sky-600 hover:underline font-semibold">
+              免費申請 Key ↗
             </a>
           </div>
           <div class="relative">
-            <input type="password" id="inputGeminiKey" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 pr-20 text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+            <input type="password" id="inputGeminiKey" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 pr-16 text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             <button onclick="toggleKeyVisibility()" type="button" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-800 font-semibold">顯示</button>
           </div>
           <p class="text-[11px] text-slate-500 leading-relaxed">
-            🔒 <strong>隱私安全聲明</strong>：金鑰只會保存在您裝置的 <code class="bg-slate-100 px-1 rounded">localStorage</code>，絕不會上傳至 GitHub 或任何第三方伺服器。開啟「AI 生成新文獻」、「AI 教授批改」與「AI 單字查詢」需填入此金鑰（無金鑰仍可離線練習 3 篇內建完整論文與複習單字）。
+            🔒 金鑰僅保存在您裝置的瀏覽器本機，絕不會上傳至 GitHub 或試算表。
           </p>
         </div>
 
-        <!-- 3. Study Group Export / Import -->
-        <div class="space-y-2.5 pt-3 border-t border-slate-100">
-          <label class="block text-xs font-bold text-slate-800">3. 讀書會戰友進度與單字本一鍵匯出／匯入</label>
-          <p class="text-[11px] text-slate-500">可將您的生字筆記本、高分作答紀錄或自生成的實證論文匯出成 JSON 檔傳給 LINE 群組戰友，也能匯入戰友分享的單字庫（自動合併不重複覆蓋）。</p>
-          <div class="grid grid-cols-2 gap-2.5 pt-1">
-            <button onclick="exportStudyData()" class="py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold flex items-center justify-center gap-1.5 transition">
-              <i data-lucide="download" class="w-4 h-4"></i> 匯出我的進度與單字檔
+        <!-- 3. Google Apps Script Cloud Sync -->
+        <div class="space-y-2 pt-3 border-t border-slate-100 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-emerald-900">3. ☁️ Google Sheets 雲端即時同步網址（選填）</label>
+            <span class="text-[11px] font-semibold text-emerald-700">支援多裝置＋戰友題庫共享</span>
+          </div>
+          <input type="url" id="inputGasUrl" placeholder="貼上 https://script.google.com/macros/s/.../exec" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          <p class="text-[11px] text-emerald-800 leading-relaxed">
+            填入您部署的 Google Apps Script 網頁應用程式網址後，每次生成新論文、送出批改或新增單字，皆會<strong>自動雙向同步</strong>至您的 Google 試算表，手機/平板/電腦與戰友皆可即時共享！
+          </p>
+        </div>
+
+        <!-- 4. Manual JSON Backup / Share -->
+        <div class="space-y-2 pt-3 border-t border-slate-100">
+          <label class="block text-xs font-bold text-slate-800">4. 離線 JSON 檔案備份與手動分享</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" onclick="exportStudyData()" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold transition">
+              ⬇️ 匯出我的進度 JSON
             </button>
-            <label class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition">
-              <i data-lucide="upload" class="w-4 h-4"></i> 匯入戰友分享檔案
+            <label class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-bold text-center cursor-pointer transition">
+              ⬆️ 匯入戰友分享 JSON
               <input type="file" id="importFileInput" accept=".json" onchange="importStudyData(event)" class="hidden" />
             </label>
           </div>
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
-          <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">取消</button>
-          <button onclick="saveSettings()" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm">儲存設定</button>
+          <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">取消</button>
+          <button type="button" onclick="saveSettings()" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm">儲存並立即同步</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2">
-    <i data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border border-slate-700">
     <span id="toastMsg"></span>
   </div>
 
@@ -715,15 +714,16 @@
       }
     ];
 
-    // ==================== STATE MANAGEMENT (LOCALSTORAGE) ====================
+    // ==================== STATE MANAGEMENT (LOCALSTORAGE + GAS SYNC) ====================
     const STORAGE_KEYS = {
       USER_NAME: 'nycu_ebm_user_name',
       API_KEY: 'nycu_ebm_gemini_api_key',
-      HISTORY: 'nycu_ebm_history_v5',
-      VOCAB: 'nycu_ebm_vocab_v5',
-      CUSTOM_ARTICLES: 'nycu_ebm_custom_articles_v5',
-      STREAK: 'nycu_ebm_streak_v5',
-      PRESCRIPTION: 'nycu_ebm_weekly_rx_v5'
+      GAS_URL: 'nycu_ebm_gas_sync_url',
+      HISTORY: 'nycu_ebm_history_v6',
+      VOCAB: 'nycu_ebm_vocab_v6',
+      CUSTOM_ARTICLES: 'nycu_ebm_custom_articles_v6',
+      STREAK: 'nycu_ebm_streak_v6',
+      PRESCRIPTION: 'nycu_ebm_weekly_rx_v6'
     };
 
     let currentArticle = BUILTIN_ARTICLES[0];
@@ -739,28 +739,70 @@
 
     // ==================== INITIALIZATION ====================
     document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      loadUserConfigUI();
-      populateArticleDropdown();
-      renderArticle(BUILTIN_ARTICLES[0]);
-      updateHeaderBadges();
-      setupSelectionListener();
+      try {
+        loadUserConfigUI();
+        populateArticleDropdown();
+        renderArticle(BUILTIN_ARTICLES[0]);
+        updateHeaderBadges();
+        setupSelectionListener();
+        const gasUrl = (localStorage.getItem(STORAGE_KEYS.GAS_URL) || '').trim();
+        if (gasUrl) {
+          syncWithCloud(false);
+        }
+      } catch (err) {
+        console.error('Initialization error:', err);
+      }
     });
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJsAttr(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;')
+        .replace(/\n/g, ' ')
+        .replace(/\r/g, '');
+    }
 
     function loadUserConfigUI() {
       const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '未設定姓名';
       const key = localStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+      const gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL) || '';
+
       document.getElementById('headerUserName').textContent = name;
       document.getElementById('inputUserName').value = name === '未設定姓名' ? '' : name;
       document.getElementById('inputGeminiKey').value = key;
+      document.getElementById('inputGasUrl').value = gasUrl;
 
       const badge = document.getElementById('apiStatusBadge');
       if (key.trim().startsWith('AIza')) {
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> API Key 已就緒`;
+        badge.textContent = '● API Key 已就緒';
         badge.className = 'inline-flex items-center gap-1 text-emerald-300 cursor-pointer hover:underline';
       } else {
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> 點此設定 API Key`;
+        badge.textContent = '● 點此設定 API Key';
         badge.className = 'inline-flex items-center gap-1 text-amber-300 cursor-pointer hover:underline';
+      }
+
+      const syncBadge = document.getElementById('syncStatusBadge');
+      const quickSyncBtn = document.getElementById('btnQuickSync');
+      if (gasUrl.trim().startsWith('https://script.google.com/')) {
+        syncBadge.textContent = '☁️ Google 雲端同步已連線';
+        syncBadge.className = 'inline-flex items-center gap-1 text-sky-300 cursor-pointer hover:underline';
+        quickSyncBtn.classList.remove('hidden');
+      } else {
+        syncBadge.textContent = '💾 本機儲存模式';
+        syncBadge.className = 'inline-flex items-center gap-1 text-slate-300 cursor-pointer hover:underline';
+        quickSyncBtn.classList.add('hidden');
       }
 
       const streakData = JSON.parse(localStorage.getItem(STORAGE_KEYS.STREAK) || '{"count":0,"lastDate":""}');
@@ -770,7 +812,6 @@
     function openSettingsModal() {
       loadUserConfigUI();
       document.getElementById('settingsModal').classList.remove('hidden');
-      lucide.createIcons();
     }
 
     function closeSettingsModal() {
@@ -782,21 +823,109 @@
       inp.type = inp.type === 'password' ? 'text' : 'password';
     }
 
-    function saveSettings() {
+    async function saveSettings() {
       const name = document.getElementById('inputUserName').value.trim() || 'NYCU 準研究生';
       const key = document.getElementById('inputGeminiKey').value.trim();
+      const gasUrl = document.getElementById('inputGasUrl').value.trim();
+
       localStorage.setItem(STORAGE_KEYS.USER_NAME, name);
       localStorage.setItem(STORAGE_KEYS.API_KEY, key);
+      localStorage.setItem(STORAGE_KEYS.GAS_URL, gasUrl);
+
       loadUserConfigUI();
       closeSettingsModal();
       showToast('設定已安全儲存於本機瀏覽器！');
+
+      if (gasUrl.startsWith('https://script.google.com/')) {
+        await syncWithCloud(true);
+      }
     }
 
-    // ==================== STUDY GROUP EXPORT / IMPORT ====================
+    // ==================== GOOGLE APPS SCRIPT CLOUD SYNC ====================
+    async function syncWithCloud(showFeedback = false) {
+      const gasUrl = (localStorage.getItem(STORAGE_KEYS.GAS_URL) || '').trim();
+      if (!gasUrl) return;
+
+      const userName = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '未命名考生';
+      const syncBadge = document.getElementById('syncStatusBadge');
+      syncBadge.textContent = '🔄 雲端同步中...';
+
+      const payload = {
+        action: 'sync',
+        userName,
+        history: JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]'),
+        vocab: JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]'),
+        customArticles: JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]')
+      };
+
+      try {
+        const res = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const cloudData = await res.json();
+
+        if (cloudData && cloudData.status === 'ok') {
+          mergeCloudDataIntoLocal(cloudData);
+          syncBadge.textContent = '☁️ 雲端已同步 (' + new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) + ')';
+          if (showFeedback) {
+            showToast('已完成 Google Sheets 雲端雙向同步！');
+          }
+        } else {
+          throw new Error(cloudData?.message || '雲端回傳格式異常');
+        }
+      } catch (err) {
+        console.warn('Cloud sync warning:', err);
+        syncBadge.textContent = '⚠️ 雲端同步待重試';
+        if (showFeedback) {
+          showToast('雲端同步連線失敗，資料已安全保存在本機：' + err.message);
+        }
+      }
+    }
+
+    function mergeCloudDataIntoLocal(data) {
+      // Merge Vocab
+      const localVocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      const vocabMap = new Map(localVocab.map(v => [v.word.toLowerCase(), v]));
+      (data.vocab || []).forEach(v => {
+        if (v && v.word && !vocabMap.has(v.word.toLowerCase())) {
+          vocabMap.set(v.word.toLowerCase(), v);
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(Array.from(vocabMap.values())));
+
+      // Merge Custom Articles
+      const localArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
+      const artIds = new Set(localArts.map(a => a.id));
+      (data.customArticles || []).forEach(a => {
+        if (a && a.id && !artIds.has(a.id)) {
+          localArts.unshift(a);
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_ARTICLES, JSON.stringify(localArts));
+
+      // Merge History
+      const localHist = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      const histIds = new Set(localHist.map(h => h.id));
+      (data.history || []).forEach(h => {
+        if (h && h.id && !histIds.has(h.id)) {
+          localHist.push(h);
+        }
+      });
+      localHist.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(localHist));
+
+      populateArticleDropdown();
+      updateHeaderBadges();
+    }
+
+    // ==================== STUDY GROUP JSON EXPORT / IMPORT ====================
     function exportStudyData() {
       const userName = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '戰友';
       const payload = {
-        app: 'NYCU_Nursing_EBM_Trainer_v5',
+        app: 'NYCU_Nursing_EBM_Trainer_v6',
         exportedBy: userName,
         exportedAt: new Date().toISOString(),
         history: JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]'),
@@ -821,51 +950,19 @@
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
-          if (!data || data.app !== 'NYCU_Nursing_EBM_Trainer_v5') {
+          if (!data || (!data.vocab && !data.history && !data.customArticles)) {
             alert('檔案格式不符，請確認匯入的是本系統匯出的 JSON 檔。');
             return;
           }
-          // Merge Vocab (avoid duplicates by lowercase word)
-          const existingVocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
-          const vocabMap = new Map(existingVocab.map(v => [v.word.toLowerCase(), v]));
-          let addedVocab = 0;
-          (data.vocab || []).forEach(v => {
-            if (!vocabMap.has(v.word.toLowerCase())) {
-              vocabMap.set(v.word.toLowerCase(), { ...v, source: `戰友分享 (${data.exportedBy || '夥伴'})` });
-              addedVocab++;
-            }
+          mergeCloudDataIntoLocal({
+            vocab: (data.vocab || []).map(v => ({ ...v, source: `戰友分享 (${data.exportedBy || '夥伴'})` })),
+            customArticles: data.customArticles || [],
+            history: (data.history || []).map(h => ({ ...h, sharedBy: data.exportedBy || '戰友' }))
           });
-          localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(Array.from(vocabMap.values())));
-
-          // Merge Custom Articles
-          const existingArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
-          const artIds = new Set(existingArts.map(a => a.id));
-          let addedArts = 0;
-          (data.customArticles || []).forEach(a => {
-            if (!artIds.has(a.id)) {
-              existingArts.unshift(a);
-              addedArts++;
-            }
-          });
-          localStorage.setItem(STORAGE_KEYS.CUSTOM_ARTICLES, JSON.stringify(existingArts));
-
-          // Merge History (tag shared records)
-          const existingHist = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
-          const histIds = new Set(existingHist.map(h => h.id));
-          let addedHist = 0;
-          (data.history || []).forEach(h => {
-            if (!histIds.has(h.id)) {
-              existingHist.push({ ...h, sharedBy: data.exportedBy || '戰友' });
-              addedHist++;
-            }
-          });
-          localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(existingHist));
-
-          populateArticleDropdown();
-          updateHeaderBadges();
           renderHistoryList();
           renderVocabList();
-          showToast(`成功匯入戰友「${data.exportedBy}」資料：新增 ${addedVocab} 個單字、${addedArts} 篇文獻、${addedHist} 筆作答觀摩！`);
+          syncWithCloud(false);
+          showToast(`成功匯入戰友「${data.exportedBy || '夥伴'}」的分享資料！`);
         } catch (err) {
           alert('讀取 JSON 檔案失敗：' + err.message);
         }
@@ -913,10 +1010,10 @@
       const customArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
       let html = '';
       BUILTIN_ARTICLES.forEach((a, idx) => {
-        html += `<option value="builtin_${idx}">內建題庫 ${idx + 1}｜${a.title.slice(0, 42)}... (${a.journal}, ${a.year})</option>`;
+        html += `<option value="builtin_${idx}">內建題庫 ${idx + 1}｜${escapeHtml(a.title.slice(0, 42))}... (${escapeHtml(a.journal)}, ${escapeHtml(a.year)})</option>`;
       });
       customArts.forEach((a, idx) => {
-        html += `<option value="custom_${idx}">AI 生成文獻 ${idx + 1}｜${a.title.slice(0, 40)}... (${a.year})</option>`;
+        html += `<option value="custom_${idx}">AI 生成文獻 ${idx + 1}｜${escapeHtml(a.title.slice(0, 40))}... (${escapeHtml(a.year)})</option>`;
       });
       sel.innerHTML = html;
     }
@@ -933,26 +1030,28 @@
     }
 
     function highlightTermsInText(text, termsObj) {
-      if (!termsObj) return text;
-      let processed = text;
+      const safeText = escapeHtml(text || '');
+      if (!termsObj || typeof termsObj !== 'object') return safeText;
+      let processed = safeText;
       const keys = Object.keys(termsObj).sort((a, b) => b.length - a.length);
       keys.forEach(term => {
-        const escaped = term.replace(/[.*+?^${}()|[\]\]/g, '\$&');
-        const regex = new RegExp(`\b(${escaped})\b`, 'gi');
-        processed = processed.replace(regex, `<span class="vocab-term" onclick="showTermHelper('${term.replace(/'/g, "\'")}')">$1</span>`);
+        const escapedRegex = escapeHtml(term).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b(${escapedRegex})\\b`, 'gi');
+        processed = processed.replace(regex, `<span class="vocab-term" onclick="showTermHelper('${escapeJsAttr(term)}')">$1</span>`);
       });
       return processed;
     }
 
     function renderArticle(article) {
       currentArticle = article;
-      document.getElementById('artBadgeJournal').textContent = article.journal;
-      document.getElementById('artBadgeYear').textContent = `發表年份：${article.year}`;
-      document.getElementById('artBadgeDesign').textContent = article.design;
-      document.getElementById('artTitle').textContent = article.title;
-      document.getElementById('artCitation').textContent = article.citation;
+      document.getElementById('artBadgeJournal').textContent = article.journal || '';
+      document.getElementById('artBadgeYear').textContent = `發表年份：${article.year || ''}`;
+      document.getElementById('artBadgeDesign').textContent = article.design || '';
+      document.getElementById('artTitle').textContent = article.title || '';
+      document.getElementById('artCitation').textContent = article.citation || '';
 
-      const fullWords = Object.values(article.sections).join(' ').split(/\s+/).length;
+      const sections = article.sections || {};
+      const fullWords = Object.values(sections).join(' ').split(/\s+/).filter(Boolean).length;
       document.getElementById('artWordCount').textContent = `全文約 ${fullWords} 字`;
 
       const sectionMeta = [
@@ -967,7 +1066,7 @@
       bodyEl.innerHTML = sectionMeta.map(sec => `
         <div class="article-section-block space-y-1.5" data-sec="${sec.key}">
           <div class="text-xs font-sans font-bold tracking-wider text-sky-800 uppercase bg-sky-50/80 px-2.5 py-1 rounded-md inline-block">${sec.label}</div>
-          <p class="text-justify">${highlightTermsInText(article.sections[sec.key] || '', article.terms)}</p>
+          <p class="text-justify">${highlightTermsInText(sections[sec.key] || '', article.terms)}</p>
         </div>
       `).join('');
 
@@ -1000,12 +1099,11 @@
       const btn = document.getElementById('btnToggleHints');
       if (hintsEnabled) {
         body.classList.remove('hide-hints');
-        btn.innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i> 術語提示：開啟`;
+        btn.textContent = '👁️ 術語提示：開啟';
       } else {
         body.classList.add('hide-hints');
-        btn.innerHTML = `<i data-lucide="eye-off" class="w-4 h-4"></i> 術語提示：關閉 (模擬考場)`;
+        btn.textContent = '🙈 術語提示：關閉 (模擬考場)';
       }
-      lucide.createIcons();
     }
 
     function toggleLayoutMode() {
@@ -1016,13 +1114,12 @@
       if (isSideBySide) {
         reader.className = 'lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden';
         answer.className = 'lg:col-span-6 space-y-5';
-        btn.innerHTML = `<i data-lucide="columns" class="w-4 h-4"></i> 左右並排對照`;
+        btn.textContent = '◫ 左右並排對照';
       } else {
         reader.className = 'lg:col-span-12 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden';
         answer.className = 'lg:col-span-12 space-y-5';
-        btn.innerHTML = `<i data-lucide="rows" class="w-4 h-4"></i> 上下全寬閱讀`;
+        btn.textContent = '☰ 上下全寬閱讀';
       }
-      lucide.createIcons();
     }
 
     function setTransMode(mode) {
@@ -1048,10 +1145,9 @@
     async function generateNewArticleAI() {
       const topic = document.getElementById('aiTopicSelect').value;
       const btn = document.getElementById('btnGenerateAI');
-      const origHtml = btn.innerHTML;
+      const origText = btn.textContent;
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 正在撰寫 5 大章節實證全文...`;
-      lucide.createIcons();
+      btn.textContent = '⏳ AI 正在撰寫 5 大章節實證全文...';
 
       const prompt = `You are a nursing professor at National Yang Ming Chiao Tung University (NYCU) preparing a master's entrance exam reading & translation passage.
 Generate a realistic, high-impact Evidence-Based Medicine (EBM) clinical research article published between 2022 and 2026 on the topic: "${topic}".
@@ -1095,13 +1191,13 @@ Return strictly valid JSON with this exact schema:
         document.getElementById('articleSelector').value = 'custom_0';
         renderArticle(generated);
         clearCurrentAnswers();
+        syncWithCloud(false);
         showToast('已成功生成全新 5 大章節實證醫學考題全文！');
       } catch (err) {
         alert(err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = origHtml;
-        lucide.createIcons();
+        btn.textContent = origText;
       }
     }
 
@@ -1146,10 +1242,9 @@ Return strictly valid JSON with this exact schema:
       }
 
       const btn = document.getElementById('btnSubmitGrade');
-      const origHtml = btn.innerHTML;
+      const origText = btn.textContent;
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 教授正在逐段閱卷與產生對照譯文...`;
-      lucide.createIcons();
+      btn.textContent = '⏳ 教授正在逐段閱卷與產生對照譯文...';
 
       const prompt = `You are a strict yet supportive Nursing Professor at National Yang Ming Chiao Tung University (NYCU) grading a master's entrance exam candidate.
 Evaluate the candidate's Chinese translation and answers to 3 critical appraisal questions based on the EBM article below.
@@ -1195,7 +1290,6 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
       try {
         const result = await callGeminiAPI(prompt, true);
 
-        // Calculate score delta if re-attempting same article
         const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
         const prevAttempts = history.filter(h => h.article.id === currentArticle.id);
         let scoreDelta = null;
@@ -1204,8 +1298,10 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
           scoreDelta = result.totalScore - lastScore;
         }
 
+        const userName = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '考生';
         const record = {
           id: 'rec_' + Date.now(),
+          userName,
           timestamp: new Date().toISOString(),
           article: currentArticle,
           userTranslation: transObj,
@@ -1219,13 +1315,13 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
         updateDailyStreak();
         updateHeaderBadges();
         displayGradingOutput(record);
-        showToast('批改完成！作答紀錄與逐段對照解析已自動永久存檔。');
+        syncWithCloud(false);
+        showToast('批改完成！作答紀錄與逐段對照解析已存檔並同步。');
       } catch (err) {
         alert(err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = origHtml;
-        lucide.createIcons();
+        btn.textContent = origText;
       }
     }
 
@@ -1262,10 +1358,10 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
 
       const tagsEl = document.getElementById('gradeWeaknessTags');
       tagsEl.innerHTML = (g.weaknessTags || []).map(tag =>
-        `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"># ${tag}</span>`
+        `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"># ${escapeHtml(tag)}</span>`
       ).join('');
 
-      document.getElementById('gradeFeedbackText').textContent = g.detailedCritique;
+      document.getElementById('gradeFeedbackText').textContent = g.detailedCritique || '';
 
       const secKeys = [
         { k: 'abstract', title: 'Abstract 摘要' },
@@ -1280,8 +1376,8 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
         <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
           <div class="bg-slate-100 px-3.5 py-1.5 font-bold text-slate-700">${s.title}</div>
           <div class="p-3.5 grid grid-cols-1 md:grid-cols-2 gap-3 bg-white">
-            <div class="text-slate-600 academic-text leading-relaxed border-b md:border-b-0 md:border-r border-slate-100 pb-2 md:pb-0 md:pr-3">${record.article.sections[s.k]}</div>
-            <div class="text-slate-900 leading-relaxed font-medium">${g.referenceTranslations?.[s.k] || ''}</div>
+            <div class="text-slate-600 academic-text leading-relaxed border-b md:border-b-0 md:border-r border-slate-100 pb-2 md:pb-0 md:pr-3">${escapeHtml(record.article.sections[s.k] || '')}</div>
+            <div class="text-slate-900 leading-relaxed font-medium">${escapeHtml(g.referenceTranslations?.[s.k] || '')}</div>
           </div>
         </div>
       `).join('');
@@ -1290,9 +1386,9 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
         html += `
           <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 space-y-2 text-xs">
             <div class="font-bold text-indigo-900 text-sm">研究所申論題滿分參考解析</div>
-            <div><strong class="text-indigo-800">Q1 解析：</strong>${g.questionModelAnswers.q1}</div>
-            <div><strong class="text-indigo-800">Q2 解析：</strong>${g.questionModelAnswers.q2}</div>
-            <div><strong class="text-indigo-800">Q3 解析：</strong>${g.questionModelAnswers.q3}</div>
+            <div><strong class="text-indigo-800">Q1 解析：</strong>${escapeHtml(g.questionModelAnswers.q1 || '')}</div>
+            <div><strong class="text-indigo-800">Q2 解析：</strong>${escapeHtml(g.questionModelAnswers.q2 || '')}</div>
+            <div><strong class="text-indigo-800">Q3 解析：</strong>${escapeHtml(g.questionModelAnswers.q3 || '')}</div>
           </div>
         `;
       }
@@ -1320,24 +1416,25 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
 
       container.innerHTML = filtered.map(rec => {
         const dateStr = new Date(rec.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-        const score = rec.grading.totalScore;
+        const score = rec.grading?.totalScore || 0;
         const scoreColor = score >= 80 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (score >= 65 ? 'text-sky-600 bg-sky-50 border-sky-200' : 'text-rose-600 bg-rose-50 border-rose-200');
-        const sharedTag = rec.sharedBy ? `<span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[11px] font-bold">戰友分享：${rec.sharedBy}</span>` : '';
+        const authorLabel = rec.sharedBy || rec.userName;
+        const sharedTag = authorLabel ? `<span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[11px] font-bold">${escapeHtml(authorLabel)}</span>` : '';
 
         return `
-          <div onclick="openHistoryDetail('${rec.id}')" class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-sky-400 shadow-sm cursor-pointer transition flex flex-col justify-between gap-3">
+          <div onclick="openHistoryDetail('${escapeJsAttr(rec.id)}')" class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-sky-400 shadow-sm cursor-pointer transition flex flex-col justify-between gap-3">
             <div>
               <div class="flex items-center justify-between gap-2 mb-2">
-                <span class="text-xs text-slate-400 font-mono">${dateStr} • ${rec.article.journal}</span>
+                <span class="text-xs text-slate-400 font-mono">${escapeHtml(dateStr)} • ${escapeHtml(rec.article?.journal || '')}</span>
                 <div class="flex items-center gap-1.5">
                   ${sharedTag}
                   <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold border ${scoreColor}">${score} 分</span>
                 </div>
               </div>
-              <h3 class="font-bold text-slate-900 text-sm line-clamp-2">${rec.article.title}</h3>
+              <h3 class="font-bold text-slate-900 text-sm line-clamp-2">${escapeHtml(rec.article?.title || '')}</h3>
             </div>
             <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
-              <span>翻譯 ${rec.grading.dimTranslation}｜統計 ${rec.grading.dimStatistics}｜評讀 ${rec.grading.dimCriticalAppraisal}</span>
+              <span>翻譯 ${rec.grading?.dimTranslation || 0}｜統計 ${rec.grading?.dimStatistics || 0}｜評讀 ${rec.grading?.dimCriticalAppraisal || 0}</span>
               <span class="text-sky-600 font-semibold">點擊雙欄重溫 →</span>
             </div>
           </div>
@@ -1353,38 +1450,35 @@ Return strictly valid JSON with this exact structure (all feedback in Traditiona
 
       const panel = document.getElementById('historyDetailPanel');
       panel.classList.remove('hidden');
-      document.getElementById('histDetailMeta').textContent = `${new Date(rec.timestamp).toLocaleString('zh-TW')}｜總分 ${rec.grading.totalScore} 分`;
-      document.getElementById('histDetailTitle').textContent = rec.article.title;
+      document.getElementById('histDetailMeta').textContent = `${new Date(rec.timestamp).toLocaleString('zh-TW')}｜總分 ${rec.grading?.totalScore || 0} 分`;
+      document.getElementById('histDetailTitle').textContent = rec.article?.title || '';
 
-      const userTransText = rec.userTranslation.mode === 'full'
+      const userTransText = rec.userTranslation?.mode === 'full'
         ? rec.userTranslation.fullText
-        : Object.entries(rec.userTranslation).filter(([k]) => k !== 'mode').map(([k, v]) => `【${k.toUpperCase()}】
-${v || '(未填寫)'}`).join('
-
-');
+        : Object.entries(rec.userTranslation || {}).filter(([k]) => k !== 'mode').map(([k, v]) => `【${k.toUpperCase()}】\n${v || '(未填寫)'}`).join('\n\n');
 
       document.getElementById('histDetailBody').innerHTML = `
         <div class="space-y-4">
           <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
             <h4 class="text-xs font-bold text-slate-700 mb-2">作答者中文翻譯紀錄</h4>
-            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${userTransText || '(無翻譯紀錄)'}</div>
+            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${escapeHtml(userTransText || '(無翻譯紀錄)')}</div>
           </div>
           <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
             <h4 class="font-bold text-slate-700">考題作答紀錄</h4>
-            <div><strong>Q1：</strong>${rec.userAnswers.q1 || '(未作答)'}</div>
-            <div><strong>Q2：</strong>${rec.userAnswers.q2 || '(未作答)'}</div>
-            <div><strong>Q3：</strong>${rec.userAnswers.q3 || '(未作答)'}</div>
+            <div><strong>Q1：</strong>${escapeHtml(rec.userAnswers?.q1 || '(未作答)')}</div>
+            <div><strong>Q2：</strong>${escapeHtml(rec.userAnswers?.q2 || '(未作答)')}</div>
+            <div><strong>Q3：</strong>${escapeHtml(rec.userAnswers?.q3 || '(未作答)')}</div>
           </div>
         </div>
         <div class="space-y-4">
           <div class="bg-amber-50/70 rounded-xl p-4 border border-amber-200">
             <h4 class="text-xs font-bold text-amber-900 mb-2">AI 指導教授評語</h4>
-            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${rec.grading.detailedCritique}</div>
+            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${escapeHtml(rec.grading?.detailedCritique || '')}</div>
           </div>
           <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200 space-y-2 text-xs">
             <h4 class="font-bold text-emerald-900">參考中譯摘要與結果</h4>
-            <div><strong>Abstract：</strong>${rec.grading.referenceTranslations?.abstract || ''}</div>
-            <div><strong>Results：</strong>${rec.grading.referenceTranslations?.results || ''}</div>
+            <div><strong>Abstract：</strong>${escapeHtml(rec.grading?.referenceTranslations?.abstract || '')}</div>
+            <div><strong>Results：</strong>${escapeHtml(rec.grading?.referenceTranslations?.results || '')}</div>
           </div>
         </div>
       `;
@@ -1418,11 +1512,11 @@ ${v || '(未填寫)'}`).join('
         return;
       }
 
-      const avg = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.totalScore, 0) / targetSet.length);
-      const max = Math.max(...targetSet.map(h => h.grading.totalScore));
-      const avgTrans = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimTranslation, 0) / targetSet.length);
-      const avgStats = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimStatistics, 0) / targetSet.length);
-      const avgCrit = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimCriticalAppraisal, 0) / targetSet.length);
+      const avg = Math.round(targetSet.reduce((acc, cur) => acc + (cur.grading?.totalScore || 0), 0) / targetSet.length);
+      const max = Math.max(...targetSet.map(h => h.grading?.totalScore || 0));
+      const avgTrans = Math.round(targetSet.reduce((acc, cur) => acc + (cur.grading?.dimTranslation || 0), 0) / targetSet.length);
+      const avgStats = Math.round(targetSet.reduce((acc, cur) => acc + (cur.grading?.dimStatistics || 0), 0) / targetSet.length);
+      const avgCrit = Math.round(targetSet.reduce((acc, cur) => acc + (cur.grading?.dimCriticalAppraisal || 0), 0) / targetSet.length);
 
       document.getElementById('wkAvgScore').textContent = `${avg} 分`;
       document.getElementById('wkMaxScore').textContent = `${max} 分`;
@@ -1435,11 +1529,11 @@ ${v || '(未填寫)'}`).join('
       document.getElementById('avgDimCritBar').style.width = `${avgCrit}%`;
 
       const tagCounts = {};
-      targetSet.forEach(h => (h.grading.weaknessTags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1));
+      targetSet.forEach(h => (h.grading?.weaknessTags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1));
       const cloudEl = document.getElementById('weeklyWeaknessCloud');
       const entries = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
       cloudEl.innerHTML = entries.length > 0
-        ? entries.map(([t, c]) => `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold">${t} (${c}次)</span>`).join('')
+        ? entries.map(([t, c]) => `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold">${escapeHtml(t)} (${c}次)</span>`).join('')
         : '目前表現優異，尚無高頻弱點標籤！';
 
       const savedRx = localStorage.getItem(STORAGE_KEYS.PRESCRIPTION);
@@ -1456,13 +1550,13 @@ ${v || '(未填寫)'}`).join('
       }
       const btn = document.getElementById('btnGenWeekly');
       btn.disabled = true;
-      btn.textContent = 'AI 教授正在分析您的學習軌跡...';
+      btn.textContent = '⏳ AI 教授正在分析您的學習軌跡...';
 
       const summaryData = history.slice(0, 10).map(h => ({
-        title: h.article.title,
-        score: h.grading.totalScore,
-        dims: [h.grading.dimTranslation, h.grading.dimStatistics, h.grading.dimCriticalAppraisal],
-        tags: h.grading.weaknessTags
+        title: h.article?.title,
+        score: h.grading?.totalScore,
+        dims: [h.grading?.dimTranslation, h.grading?.dimStatistics, h.grading?.dimCriticalAppraisal],
+        tags: h.grading?.weaknessTags
       }));
 
       const prompt = `你是陽明交通大學護理研究所指導教授。請根據考生近期的實證醫學英文讀題與翻譯表現數據，撰寫一份具體、溫暖且具實戰價值的「每週學習診斷與下週訓練處方箋」（繁體中文，約 250–350 字，包含：1. 本週優勢肯定、2. 核心失分盲點剖析、3. 下週每日 30 分鐘具體練習處方）：
@@ -1477,8 +1571,7 @@ ${v || '(未填寫)'}`).join('
         alert(err.message);
       } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="stethoscope" class="w-4 h-4"></i> 生成本週 AI 改善處方箋`;
-        lucide.createIcons();
+        btn.textContent = '🩺 生成本週 AI 改善處方箋';
       }
     }
 
@@ -1496,7 +1589,6 @@ ${v || '(未填寫)'}`).join('
           toolbar.style.left = `${Math.min(window.innerWidth - 140, Math.max(140, e.clientX))}px`;
           toolbar.style.top = `${Math.max(60, e.clientY - 48)}px`;
           toolbar.classList.remove('hidden');
-          lucide.createIcons();
         } else {
           toolbar.classList.add('hidden');
         }
@@ -1511,7 +1603,6 @@ ${v || '(未填寫)'}`).join('
       document.getElementById('termHelperPos').textContent = info.pos;
       document.getElementById('termHelperDef').textContent = info.def;
       document.getElementById('termHelperBox').classList.remove('hidden');
-      lucide.createIcons();
     }
 
     function speakCurrentTerm() {
@@ -1623,6 +1714,7 @@ Return strictly valid JSON:
       }
       localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(vocab));
       updateHeaderBadges();
+      syncWithCloud(false);
     }
 
     function deleteVocab(id) {
@@ -1670,28 +1762,27 @@ Return strictly valid JSON:
             <div>
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <h4 class="font-bold text-base text-slate-900">${v.word}</h4>
-                  <span class="text-xs text-sky-600 font-semibold">${v.pos}</span>
+                  <h4 class="font-bold text-base text-slate-900">${escapeHtml(v.word)}</h4>
+                  <span class="text-xs text-sky-600 font-semibold">${escapeHtml(v.pos || 'term')}</span>
                 </div>
                 <div class="flex items-center gap-1">
                   ${statusBadge}
-                  <button onclick="speakText('${v.word.replace(/'/g, "\'")}')" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600" title="美式發音">
-                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                  <button type="button" onclick="speakText('${escapeJsAttr(v.word)}')" class="px-2 py-1 rounded-lg hover:bg-slate-100 text-slate-600 text-xs" title="美式發音">
+                    🔊
                   </button>
-                  <button onclick="deleteVocab('${v.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600" title="刪除">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  <button type="button" onclick="deleteVocab('${escapeJsAttr(v.id)}')" class="px-2 py-1 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 text-xs" title="刪除">
+                    🗑️
                   </button>
                 </div>
               </div>
-              <p class="text-sm text-slate-800 font-medium mt-2 leading-snug">${v.def}</p>
+              <p class="text-sm text-slate-800 font-medium mt-2 leading-snug">${escapeHtml(v.def)}</p>
             </div>
             <div class="text-[11px] text-slate-400 italic border-t border-slate-100 pt-2 line-clamp-2">
-              ${v.context || ''}
+              ${escapeHtml(v.context || '')}
             </div>
           </div>
         `;
       }).join('');
-      lucide.createIcons();
     }
 
     function setVocabSubMode(mode) {
@@ -1782,8 +1873,8 @@ Return strictly valid JSON:
       const options = [target.def, ...distractors].sort(() => 0.5 - Math.random());
 
       document.getElementById('quizOptions').innerHTML = options.map(opt => `
-        <button onclick="checkQuizOption(this, '${opt.replace(/'/g, "\'")}')" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/50 text-xs font-medium text-slate-800 transition">
-          ${opt}
+        <button type="button" onclick="checkQuizOption(this, '${escapeJsAttr(opt)}')" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/50 text-xs font-medium text-slate-800 transition">
+          ${escapeHtml(opt)}
         </button>
       `).join('');
     }
@@ -1797,11 +1888,11 @@ Return strictly valid JSON:
         quizStats.correct++;
         btn.className = 'w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-xs font-bold text-emerald-900';
         feedbackEl.className = 'text-center text-xs font-bold py-2 rounded-xl bg-emerald-100 text-emerald-800';
-        feedbackEl.textContent = '答對了！完全掌握該實證詞彙釋義。';
+        feedbackEl.textContent = '🎉 答對了！完全掌握該實證詞彙釋義。';
       } else {
         btn.className = 'w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-xs font-bold text-rose-900';
         feedbackEl.className = 'text-center text-xs font-bold py-2 rounded-xl bg-rose-100 text-rose-800';
-        feedbackEl.textContent = `答錯囉！正確釋義為：${quizStats.currentAnswer}`;
+        feedbackEl.textContent = `❌ 答錯囉！正確釋義為：${quizStats.currentAnswer}`;
       }
       feedbackEl.classList.remove('hidden');
       document.getElementById('quizScoreBadge').textContent = `得分：${quizStats.correct} / ${quizStats.total}`;
@@ -1813,13 +1904,12 @@ Return strictly valid JSON:
         document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tabName);
         const btn = document.getElementById(`tab-${t}`);
         btn.className = t === tabName
-          ? 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white flex items-center gap-1.5 transition'
-          : 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition';
+          ? 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white transition'
+          : 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition';
       });
       if (tabName === 'history') renderHistoryList();
       if (tabName === 'weekly') renderWeeklyReport();
       if (tabName === 'vocab') renderVocabList();
-      lucide.createIcons();
     }
 
     function updateHeaderBadges() {
@@ -1845,7 +1935,7 @@ Return strictly valid JSON:
       document.getElementById('toastMsg').textContent = msg;
       t.classList.remove('hidden');
       clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => t.classList.add('hidden'), 3600);
+      window._toastTimer = setTimeout(() => t.classList.add('hidden'), 3800);
     }
   </script>
 </body>
