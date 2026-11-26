@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYCU 陽明交大護理碩士｜每日實證醫學英文文獻讀題與翻譯訓練工作坊 (v5.0 GitHub 獨立版)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .academic-text {
+      font-family: 'Source Serif 4', 'Times New Roman', Georgia, serif;
+      line-height: 1.85;
+      letter-spacing: 0.01em;
+    }
+    .vocab-term {
+      border-bottom: 2px dashed #0284c7;
+      background-color: #f0f9ff;
+      color: #0369a1;
+      padding: 0 3px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .vocab-term:hover {
+      background-color: #bae6fd;
+    }
+    .hide-hints .vocab-term {
+      border-bottom: none;
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+      cursor: text;
+    }
+    /* 3D Flashcard Flip */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-sky-500/20 border border-sky-400/40 p-2 rounded-xl text-sky-300">
+          <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">NYCU 護理碩士｜實證醫學英文讀題翻譯工作坊</h1>
+            <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">v5.0 GitHub 獨立版</span>
+          </div>
+          <p class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+            <span>考生：<strong id="headerUserName" class="text-sky-300">未設定姓名</strong></span>
+            <span>•</span>
+            <span>連續訓練：<strong id="streakCount" class="text-amber-300">0</strong> 天</span>
+            <span>•</span>
+            <span id="apiStatusBadge" class="inline-flex items-center gap-1 text-amber-300 cursor-pointer hover:underline" onclick="openSettingsModal()">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span> 未設定 API Key
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs & Action Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="switchMainTab('practice')" id="tab-practice" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white flex items-center gap-1.5 transition">
+          <i data-lucide="book-open" class="w-4 h-4"></i> 今日實證訓練
+        </button>
+        <button onclick="switchMainTab('history')" id="tab-history" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
+          <i data-lucide="history" class="w-4 h-4"></i> 歷史作答庫 <span id="historyCountBadge" class="text-xs bg-slate-700 px-1.5 py-0.2 rounded-full">0</span>
+        </button>
+        <button onclick="switchMainTab('weekly')" id="tab-weekly" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 每週診斷報告
+        </button>
+        <button onclick="switchMainTab('vocab')" id="tab-vocab" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition">
+          <i data-lucide="languages" class="w-4 h-4"></i> 我的單字本 <span id="dueVocabBadge" class="text-xs bg-rose-500 text-white px-1.5 py-0.2 rounded-full">0</span>
+        </button>
+        <button onclick="openSettingsModal()" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 flex items-center gap-1.5 transition" title="API Key 與讀書會戰友匯出/匯入設定">
+          <i data-lucide="settings" class="w-4 h-4"></i> 設定 / 戰友共享
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Floating Text Selection Toolbar for Instant Vocab Capture -->
+  <div id="selectionToolbar" class="hidden fixed z-50 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-700 px-2.5 py-1.5 flex items-center gap-2 text-xs transform -translate-x-1/2">
+    <span id="selectedWordPreview" class="font-semibold text-sky-300 max-w-[140px] truncate px-1"></span>
+    <button onclick="quickSaveSelection(false)" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition">
+      <i data-lucide="bookmark-plus" class="w-3.5 h-3.5"></i> 直接收藏
+    </button>
+    <button onclick="quickSaveSelection(true)" class="bg-sky-600 hover:bg-sky-500 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 transition">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI 查詢並收藏
+    </button>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== TAB 1: DAILY PRACTICE ==================== -->
+    <section id="view-practice" class="space-y-5">
+      <!-- Control Bar -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <select id="articleSelector" onchange="loadSelectedBuiltIn(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none max-w-xs sm:max-w-md">
+            <option value="0">內建題庫 1｜ICU 早期下床活動與呼吸器脫離 (Lancet Respir Med, 2024)</option>
+            <option value="1">內建題庫 2｜慢性傷口銀離子敷料與生物膜清除系統性回顧 (Cochrane, 2025)</option>
+            <option value="2">內建題庫 3｜高齡急重症譫妄預防之非藥物組合式照護 (JAMA Intern Med, 2023)</option>
+          </select>
+
+          <select id="aiTopicSelect" class="bg-sky-50 border border-sky-200 text-sky-900 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <option value="Critical Care & Mechanical Ventilation">主題：急重症與呼吸器照護</option>
+            <option value="Sepsis & Hemodynamic Management">主題：敗血症與血流動力學</option>
+            <option value="Wound Care & Pressure Injury Prevention">主題：實證傷口與壓傷預防</option>
+            <option value="Geriatric Nursing & Delirium">主題：高齡護理與譫妄照護</option>
+            <option value="Evidence-Based Nursing & Patient Safety">主題：實證護理與病人安全</option>
+          </select>
+
+          <button onclick="generateNewArticleAI()" id="btnGenerateAI" class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm flex items-center gap-1.5 transition">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> AI 生成今日新文獻 (全文)
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="toggleHints()" id="btnToggleHints" class="px-3 py-2 rounded-xl text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 flex items-center gap-1.5 transition">
+            <i data-lucide="eye" class="w-4 h-4"></i> 術語提示：開啟
+          </button>
+          <button onclick="toggleLayoutMode()" id="btnLayoutMode" class="hidden lg:flex px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 items-center gap-1.5 transition">
+            <i data-lucide="columns" class="w-4 h-4"></i> 左右並排對照
+          </button>
+        </div>
+      </div>
+
+      <!-- Term Popover Banner -->
+      <div id="termHelperBox" class="hidden bg-sky-900 text-white rounded-xl p-3.5 shadow-lg flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="bg-sky-500/30 p-2 rounded-lg mt-0.5">
+            <i data-lucide="book-marked" class="w-4 h-4 text-sky-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="termHelperWord" class="font-bold text-base text-sky-200"></span>
+              <span id="termHelperPos" class="text-xs bg-sky-800 px-2 py-0.5 rounded text-sky-300"></span>
+            </div>
+            <p id="termHelperDef" class="text-sm text-slate-100 mt-1"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="speakCurrentTerm()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium flex items-center gap-1">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 發音
+          </button>
+          <button onclick="addCurrentTermToVocab()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold flex items-center gap-1">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> + 收入我的生字本
+          </button>
+          <button onclick="document.getElementById('termHelperBox').classList.add('hidden')" class="p-1.5 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Workspace Grid -->
+      <div id="workspaceContainer" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left/Top: Full-Text EBM Article Reader -->
+        <div id="readerColumn" class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <!-- Article Metadata Header -->
+          <div class="bg-slate-50 border-b border-slate-200 p-5">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span id="artBadgeJournal" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800"></span>
+              <span id="artBadgeYear" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800"></span>
+              <span id="artBadgeDesign" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800"></span>
+              <span id="artWordCount" class="text-xs text-slate-500 ml-auto"></span>
+            </div>
+            <h2 id="artTitle" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug"></h2>
+            <p id="artCitation" class="text-xs text-slate-500 mt-1.5 font-mono"></p>
+
+            <!-- Section Filter Pills -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-200/80">
+              <span class="text-xs font-semibold text-slate-500 mr-1">章節檢視：</span>
+              <button onclick="filterSection('all')" class="sec-pill active px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-white" data-sec="all">全部全文</button>
+              <button onclick="filterSection('abstract')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="abstract">Abstract</button>
+              <button onclick="filterSection('introduction')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="introduction">1. Introduction</button>
+              <button onclick="filterSection('methods')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="methods">2. Methods</button>
+              <button onclick="filterSection('results')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="results">3. Results</button>
+              <button onclick="filterSection('discussion')" class="sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-sec="discussion">4. Discussion</button>
+            </div>
+          </div>
+
+          <!-- Article Body Content -->
+          <div id="articleBody" class="p-6 space-y-5 academic-text text-[15.5px] text-slate-800 max-h-[75vh] overflow-y-auto">
+            <!-- Rendered dynamically -->
+          </div>
+          <div class="bg-slate-50 border-t border-slate-200 px-5 py-2.5 text-xs text-slate-500 flex items-center justify-between">
+            <span>💡 提示：用滑鼠反白選取任何不會的英文單字，即可一鍵收藏或呼叫 AI 查詢釋義。</span>
+          </div>
+        </div>
+
+        <!-- Right/Bottom: Translation & NYCU Exam Questions Workspace -->
+        <div id="answerColumn" class="lg:col-span-6 space-y-5">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="pen-tool" class="w-4 h-4 text-sky-600"></i> 第一部分：學術英文中譯作答區
+              </h3>
+              <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                <button onclick="setTransMode('section')" id="btnTransSection" class="px-2.5 py-1 rounded-lg bg-white text-sky-700 shadow-sm transition">逐段分章節翻譯</button>
+                <button onclick="setTransMode('full')" id="btnTransFull" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition">整篇全文作答框</button>
+              </div>
+            </div>
+
+            <!-- Section-by-Section Translation Inputs -->
+            <div id="sectionTransInputs" class="space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Abstract 摘要中譯</label>
+                <textarea id="trans_abstract" rows="3" placeholder="請輸入 Abstract 段落之精準學術中文翻譯..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">1. Introduction 前言中譯</label>
+                <textarea id="trans_introduction" rows="3" placeholder="請輸入 Introduction 段落中譯（注意研究背景與知識缺口轉折）..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">2. Methods 研究方法中譯</label>
+                <textarea id="trans_methods" rows="3" placeholder="請輸入 Methods 段落中譯（注意研究設計、收案條件、統計檢定名詞）..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">3. Results 研究結果中譯</label>
+                <textarea id="trans_results" rows="3" placeholder="請輸入 Results 段落中譯（務必精確保留 HR/OR/RR、95% CI 與 p 值數據）..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">4. Discussion & Clinical Implications 討論與臨床應用中譯</label>
+                <textarea id="trans_discussion" rows="3" placeholder="請輸入 Discussion 段落中譯（注意臨床實務意涵與研究限制）..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+              </div>
+            </div>
+
+            <!-- Full Text Translation Input -->
+            <div id="fullTransInput" class="hidden">
+              <label class="block text-xs font-bold text-slate-700 mb-1">全篇完整中文翻譯</label>
+              <textarea id="trans_full_text" rows="14" placeholder="請在此輸入整篇實證醫學論文之完整中文翻譯..." class="w-full rounded-xl border border-slate-300 p-3.5 text-sm leading-relaxed focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Part 2: NYCU Graduate Exam Critical Appraisal Questions -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="file-question" class="w-4 h-4 text-indigo-600"></i> 第二部分：陽明交大護理碩士考題（實證評讀與臨床應用）
+            </h3>
+
+            <div>
+              <label id="q1Label" class="block text-xs font-bold text-slate-800 mb-1.5">Q1. 請以 PICO 架構解析本研究之臨床問題，並說明主要介入措施與對照組差異。</label>
+              <textarea id="ans_q1" rows="3" placeholder="P (Population): ... / I (Intervention): ... / C (Comparison): ... / O (Outcome): ..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            </div>
+
+            <div>
+              <label id="q2Label" class="block text-xs font-bold text-slate-800 mb-1.5">Q2. 請解讀本研究 3. Results 中的關鍵統計數據（如 HR/OR/RR、95% 信賴區間與 p 值）及其臨床顯著意義。</label>
+              <textarea id="ans_q2" rows="3" placeholder="請說明統計結果是否達顯著差異，並結合護理臨床實務判讀其臨床效益..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            </div>
+
+            <div>
+              <label id="q3Label" class="block text-xs font-bold text-slate-800 mb-1.5">Q3. 批判性評讀（Critical Appraisal）：本研究在研究設計或執行上存在哪些偏差風險（Risk of Bias）或臨床推論限制？</label>
+              <textarea id="ans_q3" rows="3" placeholder="請從選樣偏差、盲法限制、干擾因子或外推性（Generalizability）等面向分析..." class="w-full rounded-xl border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
+              <button onclick="clearCurrentAnswers()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+                清空作答區
+              </button>
+              <button onclick="submitForGrading()" id="btnSubmitGrade" class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md flex items-center justify-center gap-2 transition">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> 送出 AI 教授批改並存檔
+              </button>
+            </div>
+          </div>
+
+          <!-- Grading Feedback & Reference Translation Output -->
+          <div id="gradingResultCard" class="hidden bg-white rounded-2xl shadow-md border-2 border-emerald-500/40 overflow-hidden">
+            <div class="bg-emerald-900 text-white p-5 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span class="text-xs uppercase tracking-wider text-emerald-300 font-bold">NYCU 護理研究所模擬閱卷結果</span>
+                <h3 class="text-lg font-bold mt-0.5">AI 指導教授批改回饋與參考譯文</h3>
+              </div>
+              <div class="flex items-center gap-3">
+                <div id="scoreDeltaBadge" class="hidden px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-200 text-xs font-bold border border-amber-400/40"></div>
+                <div class="bg-white/10 px-4 py-2 rounded-xl text-center">
+                  <div class="text-xs text-emerald-200">綜合評分</div>
+                  <div id="gradeTotalScore" class="text-2xl font-extrabold text-white">--</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-5 space-y-5">
+              <!-- Three Core Dimension Scores -->
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                  <div class="text-xs text-slate-500 font-medium">學術翻譯精準度</div>
+                  <div id="scoreDimTrans" class="text-lg font-bold text-sky-700 mt-1">--</div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                  <div class="text-xs text-slate-500 font-medium">生物統計解讀力</div>
+                  <div id="scoreDimStats" class="text-lg font-bold text-indigo-700 mt-1">--</div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                  <div class="text-xs text-slate-500 font-medium">臨床批判評讀</div>
+                  <div id="scoreDimCrit" class="text-lg font-bold text-emerald-700 mt-1">--</div>
+                </div>
+              </div>
+
+              <!-- Weakness Tags -->
+              <div id="gradeWeaknessTags" class="flex flex-wrap gap-1.5"></div>
+
+              <!-- Detailed Critique -->
+              <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4 space-y-2">
+                <h4 class="text-sm font-bold text-amber-900 flex items-center gap-1.5">
+                  <i data-lucide="message-square-warning" class="w-4 h-4 text-amber-600"></i> 漏譯／誤譯核對與考題指導建議
+                </h4>
+                <div id="gradeFeedbackText" class="text-sm text-slate-800 leading-relaxed whitespace-pre-line"></div>
+              </div>
+
+              <!-- Paragraph-by-Paragraph Bilingual Reference -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <i data-lucide="split-square-horizontal" class="w-4 h-4 text-sky-600"></i> 逐段中英對照參考譯文與考題解析
+                </h4>
+                <div id="bilingualReferenceList" class="space-y-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: HISTORY & REVIEW ==================== -->
+    <section id="view-history" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">歷史作答與雙欄重溫檢閱中心</h2>
+          <p class="text-xs text-slate-500 mt-0.5">所有作答皆自動永久保存於本機瀏覽器，支援點開重溫對照與一鍵重新挑戰（Re-attempt）。</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="historyFilterScore" onchange="renderHistoryList()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold">
+            <option value="all">全部成績紀錄</option>
+            <option value="high">高分表現 (≥ 80 分)</option>
+            <option value="mid">穩健進步 (65–79 分)</option>
+            <option value="low">需重點複習 (< 65 分)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="historyListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+      <!-- Dual-Column History Detail Modal/Drawer -->
+      <div id="historyDetailPanel" class="hidden bg-white rounded-2xl shadow-lg border-2 border-sky-500/40 p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <span id="histDetailMeta" class="text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full"></span>
+            <h3 id="histDetailTitle" class="text-lg font-bold text-slate-900 mt-2"></h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="reattemptCurrentHistory()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重新作答此篇 (計算進步分差)
+            </button>
+            <button onclick="document.getElementById('historyDetailPanel').classList.add('hidden')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700">
+              關閉檢視
+            </button>
+          </div>
+        </div>
+
+        <div id="histDetailBody" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: WEEKLY DIAGNOSTIC REPORT ==================== -->
+    <section id="view-weekly" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">每週學習診斷與 AI 改善處方箋</h2>
+          <p class="text-xs text-slate-500 mt-0.5">彙整近 7 日練習數據、三大核心指標雷達分析與高頻弱點標籤。</p>
+        </div>
+        <button onclick="generateWeeklyPrescription()" id="btnGenWeekly" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+          <i data-lucide="stethoscope" class="w-4 h-4"></i> 生成本週 AI 改善處方箋
+        </button>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium">累計完成文獻篇數</div>
+          <div id="wkTotalCount" class="text-2xl font-extrabold text-slate-900 mt-1">0 篇</div>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium">近 7 日平均總分</div>
+          <div id="wkAvgScore" class="text-2xl font-extrabold text-sky-600 mt-1">-- 分</div>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium">最高突破分數</div>
+          <div id="wkMaxScore" class="text-2xl font-extrabold text-emerald-600 mt-1">-- 分</div>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500 font-medium">單字庫精熟度</div>
+          <div id="wkVocabMastery" class="text-2xl font-extrabold text-indigo-600 mt-1">0 / 0</div>
+        </div>
+      </div>
+
+      <!-- Dimension Bars & Weakness Distribution -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-slate-900 text-sm">陽明交大護理碩士三大核心能力平均表現</h3>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>1. 學術英文翻譯精準度</span>
+                <span id="avgDimTransText" class="text-sky-700">--%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div id="avgDimTransBar" class="bg-sky-600 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>2. 生物統計與實證數據解讀力</span>
+                <span id="avgDimStatsText" class="text-indigo-700">--%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div id="avgDimStatsBar" class="bg-indigo-600 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>3. 批判性評讀與臨床應用</span>
+                <span id="avgDimCritText" class="text-emerald-700">--%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5">
+                <div id="avgDimCritBar" class="bg-emerald-600 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100">
+            <h4 class="text-xs font-bold text-slate-700 mb-2">高頻失分弱點標籤統計</h4>
+            <div id="weeklyWeaknessCloud" class="flex flex-wrap gap-2 text-xs text-slate-500">尚無作答紀錄</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5 mb-3">
+              <i data-lucide="file-check-2" class="w-4 h-4 text-indigo-600"></i> AI 指導教授本週訓練處方箋
+            </h3>
+            <div id="weeklyPrescriptionBox" class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-line min-h-[180px]">
+              點擊右上方「生成本週 AI 改善處方箋」，系統將根據您近期的翻譯錯誤與弱點標籤，客製化下週讀書計畫。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: VOCABULARY NOTEBOOK & SRS ==================== -->
+    <section id="view-vocab" class="hidden space-y-5">
+      <!-- Top Bar & Quick Add -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">我的醫學實證單字庫與間隔重複複習</h2>
+            <p class="text-xs text-slate-500 mt-0.5">支援閱讀時反白即時收錄、美式語音朗讀、3D 翻卡記憶與四選一隨堂測驗。</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setVocabSubMode('list')" id="vmode-list" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition">單字庫清單</button>
+            <button onclick="setVocabSubMode('flashcard')" id="vmode-flashcard" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">3D 翻卡複習</button>
+            <button onclick="setVocabSubMode('quiz')" id="vmode-quiz" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">四選一隨堂測驗</button>
+          </div>
+        </div>
+
+        <!-- Manual Add Bar -->
+        <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100">
+          <input type="text" id="newVocabWord" placeholder="輸入不會的英文單字或片語 (例如: propensity score matching)" class="flex-1 min-w-[220px] bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+          <input type="text" id="newVocabManualDef" placeholder="中文釋義 (留空則由 AI 自動補全)" class="flex-1 min-w-[200px] bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+          <button onclick="manualAddVocab()" id="btnAddVocab" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> 新增 / AI 補全釋義
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-View A: Vocab List -->
+      <div id="vocab-sub-list" class="space-y-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="filterVocabList('all')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white" data-vf="all">全部單字</button>
+          <button onclick="filterVocabList('due')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="due">今日待複習</button>
+          <button onclick="filterVocabList('learning')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="learning">待加強</button>
+          <button onclick="filterVocabList('mastered')" class="vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700" data-vf="mastered">已精熟</button>
+        </div>
+        <div id="vocabGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+
+      <!-- Sub-View B: 3D Flashcards -->
+      <div id="vocab-sub-flashcard" class="hidden max-w-xl mx-auto space-y-4">
+        <div class="text-center text-xs text-slate-500">
+          複習進度：<span id="fcCounter" class="font-bold text-slate-800">0 / 0</span>（點擊卡片翻面檢視釋義與例句）
+        </div>
+        <div onclick="flipFlashcard()" class="perspective-1000 cursor-pointer h-72">
+          <div id="fcInner" class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+            <!-- Front -->
+            <div class="absolute inset-0 backface-hidden bg-white rounded-3xl shadow-md border-2 border-sky-200 p-8 flex flex-col items-center justify-center text-center">
+              <span id="fcPosBadge" class="text-xs font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full mb-3">term</span>
+              <h3 id="fcFrontWord" class="text-2xl sm:text-3xl font-extrabold text-slate-900">尚無單字</h3>
+              <button onclick="event.stopPropagation(); speakText(document.getElementById('fcFrontWord').innerText)" class="mt-4 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 flex items-center gap-1">
+                <i data-lucide="volume-2" class="w-4 h-4 text-sky-600"></i> 美式發音
+              </button>
+            </div>
+            <!-- Back -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-900 text-white rounded-3xl shadow-md p-7 flex flex-col justify-between">
+              <div>
+                <div class="text-xs text-sky-300 font-bold mb-1">實證醫學釋義</div>
+                <div id="fcBackDef" class="text-lg font-bold text-white leading-snug"></div>
+                <div class="text-xs text-slate-400 font-bold mt-4 mb-1">原句語境 / 考場備註</div>
+                <div id="fcBackContext" class="text-xs text-slate-300 italic leading-relaxed"></div>
+              </div>
+              <div class="text-center text-[11px] text-slate-400">請依據記憶程度點選下方按鈕安排下次複習</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="rateFlashcard('hard')" class="py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold">不熟 (今日重練)</button>
+          <button onclick="rateFlashcard('good')" class="py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold">有印象 (明日複習)</button>
+          <button onclick="rateFlashcard('easy')" class="py-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold">已精熟 (+4 天)</button>
+        </div>
+      </div>
+
+      <!-- Sub-View C: Multiple Choice Quiz -->
+      <div id="vocab-sub-quiz" class="hidden max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <span class="text-xs font-bold text-indigo-600">單字隨堂四選一測驗</span>
+          <span id="quizScoreBadge" class="text-xs font-bold bg-slate-100 px-2.5 py-1 rounded-full">得分：0 / 0</span>
+        </div>
+        <div id="quizBody" class="space-y-4">
+          <div class="text-center py-4">
+            <div class="text-xs text-slate-400 mb-1">請選出最符合實證醫學語境的中文解釋</div>
+            <h3 id="quizQuestionWord" class="text-2xl font-extrabold text-slate-900"></h3>
+          </div>
+          <div id="quizOptions" class="space-y-2.5"></div>
+          <div id="quizFeedback" class="hidden text-center text-xs font-bold py-2 rounded-xl"></div>
+          <button onclick="nextQuizQuestion()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">下一題</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== SETTINGS & STUDY GROUP SHARE MODAL ==================== -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i data-lucide="settings" class="w-4 h-4 text-sky-400"></i> 系統設定與讀書會戰友共享中心
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5 max-h-[82vh] overflow-y-auto">
+        <!-- 1. User Profile -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-800">1. 考生顯示名稱（用於戰友進度檔標記）</label>
+          <input type="text" id="inputUserName" placeholder="例如：林育群 / 戰友A" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+        </div>
+
+        <!-- 2. Gemini API Key -->
+        <div class="space-y-2 pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-800">2. 個人 Gemini API Key（僅安全儲存於您的瀏覽器本機）</label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-xs text-sky-600 hover:underline font-semibold flex items-center gap-0.5">
+              免費申請 Key <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+          <div class="relative">
+            <input type="password" id="inputGeminiKey" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 pr-20 text-sm font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none" />
+            <button onclick="toggleKeyVisibility()" type="button" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-800 font-semibold">顯示</button>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">
+            🔒 <strong>隱私安全聲明</strong>：金鑰只會保存在您裝置的 <code class="bg-slate-100 px-1 rounded">localStorage</code>，絕不會上傳至 GitHub 或任何第三方伺服器。開啟「AI 生成新文獻」、「AI 教授批改」與「AI 單字查詢」需填入此金鑰（無金鑰仍可離線練習 3 篇內建完整論文與複習單字）。
+          </p>
+        </div>
+
+        <!-- 3. Study Group Export / Import -->
+        <div class="space-y-2.5 pt-3 border-t border-slate-100">
+          <label class="block text-xs font-bold text-slate-800">3. 讀書會戰友進度與單字本一鍵匯出／匯入</label>
+          <p class="text-[11px] text-slate-500">可將您的生字筆記本、高分作答紀錄或自生成的實證論文匯出成 JSON 檔傳給 LINE 群組戰友，也能匯入戰友分享的單字庫（自動合併不重複覆蓋）。</p>
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <button onclick="exportStudyData()" class="py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="download" class="w-4 h-4"></i> 匯出我的進度與單字檔
+            </button>
+            <label class="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition">
+              <i data-lucide="upload" class="w-4 h-4"></i> 匯入戰友分享檔案
+              <input type="file" id="importFileInput" accept=".json" onchange="importStudyData(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+          <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200">取消</button>
+          <button onclick="saveSettings()" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm">儲存設定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2">
+    <i data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script>
+    // ==================== BUILT-IN 5-SECTION FULL-TEXT EBM ARTICLES ====================
+    const BUILTIN_ARTICLES = [
+      {
+        id: 'art_icu_mobilization_2024',
+        title: 'Early Protocolized Mobilization Versus Usual Care in Mechanically Ventilated Adults: A Multicenter Randomized Controlled Trial',
+        citation: 'The Lancet Respiratory Medicine. 2024;12(4):312–324. doi:10.1016/S2213-2600(24)00042-8',
+        journal: 'Lancet Respir Med',
+        year: '2024',
+        design: 'Multicenter RCT (n = 750)',
+        sections: {
+          abstract: 'Background: Intensive care unit (ICU)-acquired weakness prolongs mechanical ventilation and impairs long-term functional recovery. We aimed to evaluate whether early protocolized mobilization initiated within 48 hours of endotracheal intubation improves ventilator-free days and functional independence compared with usual care. Methods: In this multicenter, assessor-blinded randomized controlled trial across 18 tertiary ICUs, 750 mechanically ventilated adults were randomly assigned (1:1) to early progressive mobilization or standard physiotherapy. The primary outcome was days alive and free of mechanical ventilation at day 28. Findings: Mean ventilator-free days at day 28 were significantly higher in the early mobilization group than in the usual care group (18.4 vs. 15.2 days; mean difference 3.2 days, 95% CI 1.4–5.0; p = 0.0006). Incidence of ICU-acquired weakness at discharge was markedly reduced (adjusted odds ratio [aOR] 0.58, 95% CI 0.41–0.82; p = 0.002). Interpretation: Early nurse- and physiotherapist-led progressive mobilization safely accelerates ventilator liberation and preserves neuromuscular function.',
+          introduction: 'Critically ill patients requiring invasive mechanical ventilation frequently experience rapid skeletal muscle atrophy, losing up to 2% of muscle cross-sectional area per day during the first week of critical illness. Intensive care unit-acquired weakness (ICUAW) affects nearly 40% of patients ventilated for more than 72 hours and is independently associated with failed extubation, prolonged hospitalization, and elevated 1-year mortality. Although clinical practice guidelines endorse early rehabilitation, substantial uncertainty persists regarding the optimal timing, intensity, and hemodynamic safety thresholds of active mobilization. Previous trials reported conflicting results, largely attributable to delayed initiation beyond 72 hours and heterogeneous sedation protocols. Furthermore, nurse-driven coordination of daily sedation interruption paired with graded mobility milestones remains underexplored in high-acuity medical ICUs.',
+          methods: 'We conducted an investigator-initiated, parallel-group, assessor-blinded randomized controlled trial across 18 academic medical-surgical ICUs between January 2022 and October 2023. Eligible patients were adults aged 18 years or older expected to require invasive mechanical ventilation for at least 48 hours, with baseline functional independence (Barthel Index ≥ 70). Exclusion criteria included acute spinal cord injury, unstable intracranial hypertension, active myocardial ischemia, and moribund status. Randomization was stratified by center and APACHE II score (< 20 vs. ≥ 20) using permuted blocks. In the intervention arm, critical care nurses and physiotherapists executed a standardized 4-level mobility protocol twice daily—progressing from passive range-of-motion and sitting on the edge of the bed to active standing and ambulation—guided by strict physiological safety criteria (mean arterial pressure 65–110 mmHg, SpO2 ≥ 90% on FiO2 ≤ 0.60). Outcome assessors evaluating Medical Research Council (MRC) sum scores were masked to group allocation. Intention-to-treat analysis was performed using generalized linear mixed models.',
+          results: 'Among 1,412 screened patients, 750 were enrolled and randomized (376 to early mobilization and 374 to usual care). Baseline characteristics were well balanced, with a mean age of 62.4 years (SD 14.1) and median APACHE II score of 21 (IQR 17–26). First out-of-bed mobilization occurred at a median of 34 hours (IQR 26–44) after intubation in the intervention group versus 92 hours (IQR 74–118) in the usual care group (p < 0.0001). At day 28, patients in the early mobilization group achieved significantly more ventilator-free days (mean 18.4 vs. 15.2 days; adjusted mean difference 3.2 days, 95% CI 1.4–5.0; p = 0.0006). Secondary outcomes favored early mobilization, including lower rates of ICUAW at ICU discharge (24.5% vs. 36.1%; aOR 0.58, 95% CI 0.41–0.82; p = 0.002), shorter median ICU length of stay (8.5 vs. 11.0 days; hazard ratio [HR] for ICU discharge 1.34, 95% CI 1.15–1.56; p < 0.001), and reduced delirium duration (median 2.0 vs. 3.5 days; p = 0.008). Serious adverse events, including unplanned extubation or hemodynamic instability requiring vasopressor escalation, did not differ significantly between groups (2.7% vs. 1.9%; p = 0.48).',
+          discussion: 'In this multicenter trial, initiating a structured, nurse-coordinated mobilization protocol within 48 hours of intubation significantly increased ventilator-free days and reduced ICUAW without compromising patient safety. Unlike earlier negative trials that initiated mobilization after prolonged deep sedation, our protocol integrated light sedation targets (RASS -1 to 0) with explicit physiological stop criteria, empowering bedside nurses to safely advance mobility levels. Several limitations warrant consideration. First, blinding of bedside clinicians and patients was infeasible due to the behavioral nature of the intervention, potentially introducing performance bias. Second, participating ICUs maintained high nurse-to-patient ratios (1:1 to 1:2), which may limit generalizability to resource-constrained settings. Nevertheless, these findings provide robust evidence supporting early protocolized mobilization as a core component of the ABCDEF bundle in critical care nursing practice.'
+        },
+        terms: {
+          'assessor-blinded': { pos: 'adj.', def: '評估者盲法（由不知分組情況的第三方測量結果，減少偵測偏差 Detection Bias）' },
+          'ventilator-free days': { pos: 'n.', def: '脫離呼吸器天數（綜合存活率與呼吸器脫離速度的急重症核心複合指標）' },
+          'adjusted odds ratio': { pos: 'n.', def: '校正勝算比（aOR，控制干擾變項後兩組事件發生勝算之比值）' },
+          'permuted blocks': { pos: 'n.', def: '區組隨機分配（確保各分層組別人數在試驗過程中保持均衡）' },
+          'Intention-to-treat': { pos: 'n.', def: '意向性分析（ITT，依最初隨機分組進行統計，維持隨機化優勢並避免流失偏差）' },
+          'hazard ratio': { pos: 'n.', def: '風險比（HR，常用於存活分析或時間至事件發生如轉出加護病房速度之比較）' },
+          'performance bias': { pos: 'n.', def: '執行偏差（因照護者或受試者知曉分組而產生額外照護差異之系統性誤差）' },
+          'generalizability': { pos: 'n.', def: '外推性／類推性（研究結果應用於其他臨床場域或族群之程度）' }
+        },
+        questions: {
+          q1: 'Q1. 請以 PICO 架構解析本研究之臨床問題，並說明介入組「早期組合式活動」的啟動時機與安全生理閾值。',
+          q2: 'Q2. 請解讀 3. Results 中 28 天脫離呼吸器天數（mean difference 3.2 days）與 ICUAW（aOR 0.58, 95% CI 0.41–0.82）的統計與臨床意義。',
+          q3: 'Q3. 作者在 Discussion 中提及本研究存在哪些方法學限制與偏差風險（Risk of Bias）？對台灣臨床加護病房推展有何啟示？'
+        }
+      },
+      {
+        id: 'art_wound_silver_2025',
+        title: 'Silver-Impregnated Dressings Versus Non-Medicated Hydrofiber Dressings for Biofilm-Infected Chronic Venous Leg Ulcers: A Systematic Review and Meta-Analysis',
+        citation: 'Cochrane Database of Systematic Reviews. 2025;3:CD014892. doi:10.1002/14651858.CD014892.pub2',
+        journal: 'Cochrane Syst Rev',
+        year: '2025',
+        design: 'Systematic Review & Meta-Analysis (14 RCTs)',
+        sections: {
+          abstract: 'Background: Chronic venous leg ulcers (VLUs) colonized by polymicrobial biofilms exhibit delayed epithelialization and high recurrence. Silver-impregnated dressings are widely utilized for antimicrobial wound bed preparation, yet their comparative effectiveness remains debated. Objectives: To assess the effects of silver-impregnated dressings compared with non-medicated dressings on complete ulcer healing and biofilm eradication in adults with chronic VLUs. Main Results: Fourteen randomized controlled trials (1,842 participants) met inclusion criteria. Silver dressings significantly increased complete ulcer healing at 12 weeks compared with non-medicated dressings (risk ratio [RR] 1.38, 95% CI 1.16–1.64; p = 0.0003; I² = 32%, moderate-certainty evidence), corresponding to a number needed to treat (NNT) of 7. Wound area reduction at 4 weeks was also greater (standardized mean difference [SMD] 0.54, 95% CI 0.31–0.77). Authors Conclusions: Short-term (4-to-6-week) application of ionic silver dressings accelerates wound bed bioburden reduction and 12-week healing in clinically infected VLUs, though prolonged prophylactic use beyond 6 weeks is unsupported.',
+          introduction: 'Chronic venous leg ulcers represent the most prevalent lower-extremity chronic wounds, imposing substantial physical pain and healthcare expenditure. Over 60% of non-healing VLUs harbor structured bacterial biofilms—extracellular polymeric substance matrices that shield pathogens such as Staphylococcus aureus and Pseudomonas aeruginosa from host neutrophils and systemic antibiotics. Modern wound care guidelines advocate a "step-down, step-up" antimicrobial stewardship strategy, utilizing topical antiseptic dressings such as nanocrystalline or ionic silver to disrupt biofilm integrity. However, concerns regarding silver-induced cytotoxicity toward proliferating keratinocytes, dressing acquisition costs, and inconsistent clinical trial endpoints necessitate a rigorous synthesis of contemporary evidence.',
+          methods: 'We systematically searched MEDLINE, Embase, CINAHL, and the Cochrane Central Register of Controlled Trials from inception through December 2024 without language restrictions. Eligible studies were randomized controlled trials comparing any silver-releasing dressing against non-medicated moisture-retentive dressings (hydrofiber, foam, or alginate) alongside standardized multilayer compression therapy in adults with chronic VLUs (> 6 weeks duration). Two reviewers independently screened citations, extracted data, and evaluated methodological quality using the Cochrane Risk of Bias 2 (RoB 2) tool. Primary outcomes were proportion of ulcers completely healed at 12 weeks and incidence of local wound infection. Random-effects meta-analyses were conducted to compute pooled risk ratios (RR) and 95% confidence intervals, while heterogeneity was quantified using the I² statistic. Certainty of evidence was appraised using the GRADE framework.',
+          results: 'Fourteen RCTs encompassing 1,842 participants (mean age 68.7 years; baseline ulcer area 11.4 cm²) were included. Five trials were judged at low overall risk of bias, six had some concerns due to unclear allocation concealment, and three were at high risk due to attrition bias (> 20% dropout). Pooled analysis of 11 trials (n = 1,490) demonstrated that silver-impregnated dressings significantly improved complete ulcer healing at 12 weeks (44.2% vs. 31.8%; RR 1.38, 95% CI 1.16–1.64; p = 0.0003; I² = 32%), yielding an NNT of 7 (95% CI 5–12). Subgroup analysis revealed that benefits were concentrated in ulcers exhibiting baseline clinical signs of critical colonization or biofilm (RR 1.52, 95% CI 1.24–1.86), whereas non-infected ulcers showed no statistically significant benefit (RR 1.09, 95% CI 0.85–1.40; p for interaction = 0.04). Transient periwound skin staining occurred more frequently with silver dressings (RR 3.40, 95% CI 1.65–7.01), but severe contact dermatitis was rare (1.2%).',
+          discussion: 'This meta-analysis demonstrates moderate-certainty evidence that incorporating silver-impregnated dressings into standard compression therapy significantly enhances 12-week complete healing in biofilm-burdened venous leg ulcers. Crucially, interaction testing confirms that therapeutic efficacy is confined to wounds with overt bioburden, reinforcing antimicrobial stewardship principles: silver dressings should be deployed as a targeted 2-to-4-week intervention to eradicate biofilm and then stepped down to non-medicated dressings once healthy granulation tissue emerges. Limitations include moderate clinical heterogeneity across silver release kinetics and incomplete blinding of wound care nurses. Future trials should incorporate standardized molecular biofilm assays and cost-effectiveness evaluations.'
+        },
+        terms: {
+          'polymicrobial biofilms': { pos: 'n.', def: '多菌種生物膜（細菌分泌胞外基質形成的保護屏障，是慢性傷口難癒合的主因）' },
+          'risk ratio': { pos: 'n.', def: '相對風險比（RR，介入組與對照組發生特定結果之機率比值）' },
+          'number needed to treat': { pos: 'n.', def: '需治數（NNT，每治療多少位病人可額外多獲得 1 例成功治癒，數值越小代表效益越高）' },
+          'allocation concealment': { pos: 'n.', def: '分派隱藏（避免收案人員預知下一位受試者組別而產生選樣偏差 Selection Bias）' },
+          'attrition bias': { pos: 'n.', def: '流失偏差（因兩組受試者退出或失聯比例不均所導致的結果偏誤）' },
+          'I² statistic': { pos: 'n.', def: '異質性指標（量化統合分析中各研究間變異程度，<40% 通常代表低至中度異質性）' },
+          'GRADE framework': { pos: 'n.', def: '實證等級評比架構（依據偏差風險、不一致性、間接性等評估證據確定性高、中、低、極低）' },
+          'antimicrobial stewardship': { pos: 'n.', def: '抗菌藥物／敷料管理策略（精準限時使用含銀敷料，避免過度使用導致細胞毒性與浪費）' }
+        },
+        questions: {
+          q1: 'Q1. 請以 PICO 架構說明本篇 Cochrane 系統性回顧之研究問題，並解釋「step-down, step-up」敷料管理策略的臨床意義。',
+          q2: 'Q2. 請解讀主要結果 RR 1.38 (95% CI 1.16–1.64)、I² = 32% 與 NNT = 7 的實證意涵，以及次群組分析（p for interaction = 0.04）帶來的決策啟示。',
+          q3: 'Q3. 納入的 14 篇 RCT 在 RoB 2 偏差風險評估中出現哪些主要問題？護理師在臨床選擇銀離子敷料時應注意哪些限制？'
+        }
+      },
+      {
+        id: 'art_delirium_bundle_2023',
+        title: 'Multicomponent Nonpharmacologic Delirium Prevention Bundle in Older Hospitalized Adults: A Stepped-Wedge Cluster Randomized Trial',
+        citation: 'JAMA Internal Medicine. 2023;183(9):945–954. doi:10.1001/jamainternmed.2023.3102',
+        journal: 'JAMA Intern Med',
+        year: '2023',
+        design: 'Stepped-Wedge Cluster RCT (n = 2,140)',
+        sections: {
+          abstract: 'Importance: Post-admission delirium affects up to 30% of hospitalized older adults and accelerates cognitive decline and institutionalization. Objective: To evaluate the clinical effectiveness of a nurse-led multicomponent nonpharmacologic delirium prevention bundle across general medical wards. Design, Setting, and Participants: A stepped-wedge cluster randomized trial involving 12 medical wards and 2,140 patients aged 70 years or older. Interventions: Structured cognitive orientation, early sensory aid provision (eyeglasses and hearing amplifiers), sleep hygiene preservation, and hydration monitoring delivered by bedside nurses and trained volunteers. Main Outcomes and Measures: Incident delirium assessed twice daily using the Confusion Assessment Method (CAM). Results: Delirium incidence decreased from 21.8% during control periods to 13.4% during intervention periods (adjusted risk ratio [aRR] 0.61, 95% CI 0.49–0.76; p < 0.001). Falls and physical restraint use also declined significantly. Conclusions and Relevance: Implementation of a structured nurse-led nonpharmacologic bundle substantially reduces hospital-acquired delirium in older adults.',
+          introduction: 'Hospital-acquired delirium—an acute, fluctuating disturbance in attention and awareness—is a devastating geriatric syndrome linked to prolonged length of stay, inpatient falls, and incident dementia. Because antipsychotic medications fail to prevent delirium and carry significant cerebrovascular risks, nonpharmacologic multicomponent interventions targeting modifiable precipitating factors represent the cornerstone of preventive nursing care. However, real-world sustainability outside specialized geriatric units has been hindered by competing nursing workloads and fragmented workflow integration.',
+          methods: 'We executed a pragmatic stepped-wedge cluster randomized trial across 12 acute medical wards in four hospitals over 16 months. Every 2 months, two wards transitioned sequentially from usual care to the intervention bundle in random order. Patients aged 70 years or older without baseline delirium at admission were enrolled. The nurse-led bundle comprised four daily protocols: (1) thrice-daily cognitive reorientation and therapeutic activities; (2) immediate provision of visual and hearing aids; (3) nonpharmacologic sleep enhancement (minimizing nocturnal vital sign checks and ambient noise between 23:00 and 06:00); and (4) structured oral hydration encouragement. Trained research nurses masked to ward transition schedules assessed delirium twice daily via the validated Confusion Assessment Method (CAM). Mixed-effects Poisson regression accounted for clustering within wards and secular time trends.',
+          results: 'Of 2,140 enrolled older adults (mean age 79.6 years; 54.2% women; 28.4% with preexisting mild cognitive impairment), 1,052 were admitted during control periods and 1,088 during intervention periods. Overall bundle adherence reached 84.5%. Incident delirium occurred in 146 patients (13.4%) in the intervention phase versus 229 patients (21.8%) in the control phase (aRR 0.61, 95% CI 0.49–0.76; p < 0.001). Among patients who developed delirium, median episode duration was shortened by 1.5 days (2.0 vs. 3.5 days; p = 0.004). Secondary safety outcomes showed significant reductions in physical restraint application (3.1% vs. 7.4%; aOR 0.40, 95% CI 0.25–0.64; p < 0.001) and inpatient falls (1.8% vs. 3.6%; p = 0.01).',
+          discussion: 'This stepped-wedge cluster randomized trial demonstrates that embedding a pragmatic, nurse-led nonpharmacologic prevention bundle into routine ward workflows reduces delirium incidence by nearly 40% while curbing physical restraint utilization. Importantly, minimizing unnecessary nocturnal nursing interruptions preserved circadian sleep architecture without compromising clinical safety. Study limitations include potential secular trend confounding inherent to stepped-wedge designs and reliance on volunteer support for cognitive stimulation activities, which may require adaptation in hospitals without volunteer infrastructure.'
+        },
+        terms: {
+          'stepped-wedge cluster randomized trial': { pos: 'n.', def: '階梯式群集隨機試驗（以病房為群集單位，依隨機順序分階段逐步導入介入措施之實用性試驗設計）' },
+          'precipitating factors': { pos: 'n.', def: '誘發因子（如感染、睡眠剝奪、身體約束、脫水等急性引發譫妄的環境或生理因素）' },
+          'Confusion Assessment Method': { pos: 'n.', def: '譫妄評估量表（CAM，臨床與實證研究最常使用的標準化譫妄篩檢工具）' },
+          'clustering': { pos: 'n.', def: '群集效應（同一病房內病患照護結果具有相關性，統計分析需以混合效應模型校正）' },
+          'secular time trends': { pos: 'n.', def: '長期時間趨勢（隨研究進行期間季節或院內政策自然變化對結果造成的干擾）' },
+          'circadian sleep architecture': { pos: 'n.', def: '晝夜節律睡眠結構（維持夜間連續睡眠週期以預防高齡住院病人急性譫妄）' }
+        },
+        questions: {
+          q1: 'Q1. 請以 PICO 架構解析本研究，並說明「階梯式群集隨機試驗（Stepped-Wedge Cluster RCT）」為何適合用於護理照護組合（Care Bundle）的實證評估？',
+          q2: 'Q2. 請解讀主要結果 aRR 0.61 (95% CI 0.49–0.76) 與次要結果身體約束下降（aOR 0.40）的臨床護理價值。',
+          q3: 'Q3. 作者指出階梯式設計與志工人力可能帶來哪些限制？若要將此方案導入台灣內科病房，護理人員可如何調整工作流程？'
+        }
+      }
+    ];
+
+    // ==================== STATE MANAGEMENT (LOCALSTORAGE) ====================
+    const STORAGE_KEYS = {
+      USER_NAME: 'nycu_ebm_user_name',
+      API_KEY: 'nycu_ebm_gemini_api_key',
+      HISTORY: 'nycu_ebm_history_v5',
+      VOCAB: 'nycu_ebm_vocab_v5',
+      CUSTOM_ARTICLES: 'nycu_ebm_custom_articles_v5',
+      STREAK: 'nycu_ebm_streak_v5',
+      PRESCRIPTION: 'nycu_ebm_weekly_rx_v5'
+    };
+
+    let currentArticle = BUILTIN_ARTICLES[0];
+    let hintsEnabled = true;
+    let isSideBySide = true;
+    let transMode = 'section';
+    let selectedTextCache = '';
+    let activeTermObj = null;
+    let activeHistoryRecord = null;
+    let vocabFilter = 'all';
+    let fcIndex = 0;
+    let quizStats = { correct: 0, total: 0, currentAnswer: '' };
+
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      loadUserConfigUI();
+      populateArticleDropdown();
+      renderArticle(BUILTIN_ARTICLES[0]);
+      updateHeaderBadges();
+      setupSelectionListener();
+    });
+
+    function loadUserConfigUI() {
+      const name = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '未設定姓名';
+      const key = localStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+      document.getElementById('headerUserName').textContent = name;
+      document.getElementById('inputUserName').value = name === '未設定姓名' ? '' : name;
+      document.getElementById('inputGeminiKey').value = key;
+
+      const badge = document.getElementById('apiStatusBadge');
+      if (key.trim().startsWith('AIza')) {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> API Key 已就緒`;
+        badge.className = 'inline-flex items-center gap-1 text-emerald-300 cursor-pointer hover:underline';
+      } else {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> 點此設定 API Key`;
+        badge.className = 'inline-flex items-center gap-1 text-amber-300 cursor-pointer hover:underline';
+      }
+
+      const streakData = JSON.parse(localStorage.getItem(STORAGE_KEYS.STREAK) || '{"count":0,"lastDate":""}');
+      document.getElementById('streakCount').textContent = streakData.count || 0;
+    }
+
+    function openSettingsModal() {
+      loadUserConfigUI();
+      document.getElementById('settingsModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function toggleKeyVisibility() {
+      const inp = document.getElementById('inputGeminiKey');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function saveSettings() {
+      const name = document.getElementById('inputUserName').value.trim() || 'NYCU 準研究生';
+      const key = document.getElementById('inputGeminiKey').value.trim();
+      localStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+      localStorage.setItem(STORAGE_KEYS.API_KEY, key);
+      loadUserConfigUI();
+      closeSettingsModal();
+      showToast('設定已安全儲存於本機瀏覽器！');
+    }
+
+    // ==================== STUDY GROUP EXPORT / IMPORT ====================
+    function exportStudyData() {
+      const userName = localStorage.getItem(STORAGE_KEYS.USER_NAME) || '戰友';
+      const payload = {
+        app: 'NYCU_Nursing_EBM_Trainer_v5',
+        exportedBy: userName,
+        exportedAt: new Date().toISOString(),
+        history: JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]'),
+        vocab: JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]'),
+        customArticles: JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]')
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `NYCU_EBM_讀書會分享_${userName}_${dateStr}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`已匯出「${userName}」的作答紀錄與單字本 JSON 檔！`);
+    }
+
+    function importStudyData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data || data.app !== 'NYCU_Nursing_EBM_Trainer_v5') {
+            alert('檔案格式不符，請確認匯入的是本系統匯出的 JSON 檔。');
+            return;
+          }
+          // Merge Vocab (avoid duplicates by lowercase word)
+          const existingVocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+          const vocabMap = new Map(existingVocab.map(v => [v.word.toLowerCase(), v]));
+          let addedVocab = 0;
+          (data.vocab || []).forEach(v => {
+            if (!vocabMap.has(v.word.toLowerCase())) {
+              vocabMap.set(v.word.toLowerCase(), { ...v, source: `戰友分享 (${data.exportedBy || '夥伴'})` });
+              addedVocab++;
+            }
+          });
+          localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(Array.from(vocabMap.values())));
+
+          // Merge Custom Articles
+          const existingArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
+          const artIds = new Set(existingArts.map(a => a.id));
+          let addedArts = 0;
+          (data.customArticles || []).forEach(a => {
+            if (!artIds.has(a.id)) {
+              existingArts.unshift(a);
+              addedArts++;
+            }
+          });
+          localStorage.setItem(STORAGE_KEYS.CUSTOM_ARTICLES, JSON.stringify(existingArts));
+
+          // Merge History (tag shared records)
+          const existingHist = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+          const histIds = new Set(existingHist.map(h => h.id));
+          let addedHist = 0;
+          (data.history || []).forEach(h => {
+            if (!histIds.has(h.id)) {
+              existingHist.push({ ...h, sharedBy: data.exportedBy || '戰友' });
+              addedHist++;
+            }
+          });
+          localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(existingHist));
+
+          populateArticleDropdown();
+          updateHeaderBadges();
+          renderHistoryList();
+          renderVocabList();
+          showToast(`成功匯入戰友「${data.exportedBy}」資料：新增 ${addedVocab} 個單字、${addedArts} 篇文獻、${addedHist} 筆作答觀摩！`);
+        } catch (err) {
+          alert('讀取 JSON 檔案失敗：' + err.message);
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    // ==================== GEMINI API CALLER (STANDALONE) ====================
+    async function callGeminiAPI(promptText, expectJson = false) {
+      const apiKey = (localStorage.getItem(STORAGE_KEYS.API_KEY) || '').trim();
+      if (!apiKey) {
+        openSettingsModal();
+        throw new Error('請先在設定視窗填入您的 Gemini API Key，即可啟用 AI 生成與教授批改功能！');
+      }
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const body = {
+        contents: [{ parts: [{ text: promptText }] }],
+        generationConfig: expectJson ? { responseMimeType: "application/json", temperature: 0.4 } : { temperature: 0.5 }
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `API 請求失敗 (${res.status})`);
+      }
+
+      const data = await res.json();
+      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (expectJson) {
+        return JSON.parse(rawText);
+      }
+      return rawText;
+    }
+
+    // ==================== ARTICLE RENDERING & AI GENERATION ====================
+    function populateArticleDropdown() {
+      const sel = document.getElementById('articleSelector');
+      const customArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
+      let html = '';
+      BUILTIN_ARTICLES.forEach((a, idx) => {
+        html += `<option value="builtin_${idx}">內建題庫 ${idx + 1}｜${a.title.slice(0, 42)}... (${a.journal}, ${a.year})</option>`;
+      });
+      customArts.forEach((a, idx) => {
+        html += `<option value="custom_${idx}">AI 生成文獻 ${idx + 1}｜${a.title.slice(0, 40)}... (${a.year})</option>`;
+      });
+      sel.innerHTML = html;
+    }
+
+    function loadSelectedBuiltIn(val) {
+      if (val.startsWith('builtin_')) {
+        const idx = parseInt(val.split('_')[1], 10);
+        renderArticle(BUILTIN_ARTICLES[idx]);
+      } else if (val.startsWith('custom_')) {
+        const idx = parseInt(val.split('_')[1], 10);
+        const customArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
+        if (customArts[idx]) renderArticle(customArts[idx]);
+      }
+    }
+
+    function highlightTermsInText(text, termsObj) {
+      if (!termsObj) return text;
+      let processed = text;
+      const keys = Object.keys(termsObj).sort((a, b) => b.length - a.length);
+      keys.forEach(term => {
+        const escaped = term.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+        const regex = new RegExp(`\b(${escaped})\b`, 'gi');
+        processed = processed.replace(regex, `<span class="vocab-term" onclick="showTermHelper('${term.replace(/'/g, "\'")}')">$1</span>`);
+      });
+      return processed;
+    }
+
+    function renderArticle(article) {
+      currentArticle = article;
+      document.getElementById('artBadgeJournal').textContent = article.journal;
+      document.getElementById('artBadgeYear').textContent = `發表年份：${article.year}`;
+      document.getElementById('artBadgeDesign').textContent = article.design;
+      document.getElementById('artTitle').textContent = article.title;
+      document.getElementById('artCitation').textContent = article.citation;
+
+      const fullWords = Object.values(article.sections).join(' ').split(/\s+/).length;
+      document.getElementById('artWordCount').textContent = `全文約 ${fullWords} 字`;
+
+      const sectionMeta = [
+        { key: 'abstract', label: 'ABSTRACT 摘要' },
+        { key: 'introduction', label: '1. INTRODUCTION 前言' },
+        { key: 'methods', label: '2. METHODS 研究方法' },
+        { key: 'results', label: '3. RESULTS 研究結果' },
+        { key: 'discussion', label: '4. DISCUSSION & CLINICAL IMPLICATIONS 討論與臨床應用' }
+      ];
+
+      const bodyEl = document.getElementById('articleBody');
+      bodyEl.innerHTML = sectionMeta.map(sec => `
+        <div class="article-section-block space-y-1.5" data-sec="${sec.key}">
+          <div class="text-xs font-sans font-bold tracking-wider text-sky-800 uppercase bg-sky-50/80 px-2.5 py-1 rounded-md inline-block">${sec.label}</div>
+          <p class="text-justify">${highlightTermsInText(article.sections[sec.key] || '', article.terms)}</p>
+        </div>
+      `).join('');
+
+      if (article.questions) {
+        document.getElementById('q1Label').textContent = article.questions.q1;
+        document.getElementById('q2Label').textContent = article.questions.q2;
+        document.getElementById('q3Label').textContent = article.questions.q3;
+      }
+
+      document.getElementById('gradingResultCard').classList.add('hidden');
+      filterSection('all');
+    }
+
+    function filterSection(secKey) {
+      document.querySelectorAll('.sec-pill').forEach(btn => {
+        if (btn.dataset.sec === secKey) {
+          btn.className = 'sec-pill active px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-white';
+        } else {
+          btn.className = 'sec-pill px-2.5 py-1 rounded-lg text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-100';
+        }
+      });
+      document.querySelectorAll('.article-section-block').forEach(block => {
+        block.style.display = (secKey === 'all' || block.dataset.sec === secKey) ? 'block' : 'none';
+      });
+    }
+
+    function toggleHints() {
+      hintsEnabled = !hintsEnabled;
+      const body = document.getElementById('articleBody');
+      const btn = document.getElementById('btnToggleHints');
+      if (hintsEnabled) {
+        body.classList.remove('hide-hints');
+        btn.innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i> 術語提示：開啟`;
+      } else {
+        body.classList.add('hide-hints');
+        btn.innerHTML = `<i data-lucide="eye-off" class="w-4 h-4"></i> 術語提示：關閉 (模擬考場)`;
+      }
+      lucide.createIcons();
+    }
+
+    function toggleLayoutMode() {
+      isSideBySide = !isSideBySide;
+      const reader = document.getElementById('readerColumn');
+      const answer = document.getElementById('answerColumn');
+      const btn = document.getElementById('btnLayoutMode');
+      if (isSideBySide) {
+        reader.className = 'lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden';
+        answer.className = 'lg:col-span-6 space-y-5';
+        btn.innerHTML = `<i data-lucide="columns" class="w-4 h-4"></i> 左右並排對照`;
+      } else {
+        reader.className = 'lg:col-span-12 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden';
+        answer.className = 'lg:col-span-12 space-y-5';
+        btn.innerHTML = `<i data-lucide="rows" class="w-4 h-4"></i> 上下全寬閱讀`;
+      }
+      lucide.createIcons();
+    }
+
+    function setTransMode(mode) {
+      transMode = mode;
+      const secBox = document.getElementById('sectionTransInputs');
+      const fullBox = document.getElementById('fullTransInput');
+      const btnSec = document.getElementById('btnTransSection');
+      const btnFull = document.getElementById('btnTransFull');
+
+      if (mode === 'section') {
+        secBox.classList.remove('hidden');
+        fullBox.classList.add('hidden');
+        btnSec.className = 'px-2.5 py-1 rounded-lg bg-white text-sky-700 shadow-sm transition';
+        btnFull.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition';
+      } else {
+        secBox.classList.add('hidden');
+        fullBox.classList.remove('hidden');
+        btnFull.className = 'px-2.5 py-1 rounded-lg bg-white text-sky-700 shadow-sm transition';
+        btnSec.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition';
+      }
+    }
+
+    async function generateNewArticleAI() {
+      const topic = document.getElementById('aiTopicSelect').value;
+      const btn = document.getElementById('btnGenerateAI');
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> AI 正在撰寫 5 大章節實證全文...`;
+      lucide.createIcons();
+
+      const prompt = `You are a nursing professor at National Yang Ming Chiao Tung University (NYCU) preparing a master's entrance exam reading & translation passage.
+Generate a realistic, high-impact Evidence-Based Medicine (EBM) clinical research article published between 2022 and 2026 on the topic: "${topic}".
+The total English length across all 5 sections MUST be comprehensive (around 900 to 1,100 words total) with realistic biostatistical figures (e.g., HR, aOR, RR, 95% CI, p-value, IQR, I²).
+Return strictly valid JSON with this exact schema:
+{
+  "title": "Full academic English title",
+  "citation": "Journal Name. Year;Vol(Issue):Pages. doi:...",
+  "journal": "Short Journal Name",
+  "year": "2025",
+  "design": "Study Design & Sample Size",
+  "sections": {
+    "abstract": "Structured abstract (Background, Methods, Results, Interpretation) ~180 words",
+    "introduction": "Clinical background, pathophysiology/rationale, and knowledge gap ~180 words",
+    "methods": "Setting, eligibility, randomization/blinding, intervention protocol, outcome measures, statistical analysis ~220 words",
+    "results": "Participant flow, baseline data, primary and secondary outcomes with exact statistics ~220 words",
+    "discussion": "Key findings interpretation, comparison with prior studies, methodological limitations/risk of bias, and nursing clinical implications ~200 words"
+  },
+  "terms": {
+    "key_term_1": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" },
+    "key_term_2": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" },
+    "key_term_3": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" },
+    "key_term_4": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" },
+    "key_term_5": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" },
+    "key_term_6": { "pos": "n./adj.", "def": "繁體中文醫學統計釋義與考場提示" }
+  },
+  "questions": {
+    "q1": "Q1. 繁體中文研究所考題（聚焦 PICO 與介入措施細節）",
+    "q2": "Q2. 繁體中文研究所考題（聚焦生物統計數據判讀與臨床顯著意義）",
+    "q3": "Q3. 繁體中文研究所考題（聚焦偏差風險 Risk of Bias 與臨床外推限制）"
+  }
+}`;
+
+      try {
+        const generated = await callGeminiAPI(prompt, true);
+        generated.id = 'custom_' + Date.now();
+        const customArts = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_ARTICLES) || '[]');
+        customArts.unshift(generated);
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_ARTICLES, JSON.stringify(customArts));
+        populateArticleDropdown();
+        document.getElementById('articleSelector').value = 'custom_0';
+        renderArticle(generated);
+        clearCurrentAnswers();
+        showToast('已成功生成全新 5 大章節實證醫學考題全文！');
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }
+    }
+
+    // ==================== GRADING & HISTORY STORAGE ====================
+    function getUserTranslationBundle() {
+      if (transMode === 'full') {
+        return {
+          mode: 'full',
+          fullText: document.getElementById('trans_full_text').value.trim()
+        };
+      }
+      return {
+        mode: 'section',
+        abstract: document.getElementById('trans_abstract').value.trim(),
+        introduction: document.getElementById('trans_introduction').value.trim(),
+        methods: document.getElementById('trans_methods').value.trim(),
+        results: document.getElementById('trans_results').value.trim(),
+        discussion: document.getElementById('trans_discussion').value.trim()
+      };
+    }
+
+    function clearCurrentAnswers() {
+      ['trans_abstract', 'trans_introduction', 'trans_methods', 'trans_results', 'trans_discussion', 'trans_full_text', 'ans_q1', 'ans_q2', 'ans_q3'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('gradingResultCard').classList.add('hidden');
+    }
+
+    async function submitForGrading() {
+      const transObj = getUserTranslationBundle();
+      const q1 = document.getElementById('ans_q1').value.trim();
+      const q2 = document.getElementById('ans_q2').value.trim();
+      const q3 = document.getElementById('ans_q3').value.trim();
+
+      const hasAnyTrans = transObj.mode === 'full'
+        ? transObj.fullText.length > 10
+        : Object.values(transObj).some(v => typeof v === 'string' && v !== 'section' && v.length > 5);
+
+      if (!hasAnyTrans && !q1 && !q2 && !q3) {
+        alert('請至少輸入部分段落中譯或考題作答後再送出批改！');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitGrade');
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 教授正在逐段閱卷與產生對照譯文...`;
+      lucide.createIcons();
+
+      const prompt = `You are a strict yet supportive Nursing Professor at National Yang Ming Chiao Tung University (NYCU) grading a master's entrance exam candidate.
+Evaluate the candidate's Chinese translation and answers to 3 critical appraisal questions based on the EBM article below.
+
+Article Title: ${currentArticle.title}
+Sections:
+- Abstract: ${currentArticle.sections.abstract}
+- Introduction: ${currentArticle.sections.introduction}
+- Methods: ${currentArticle.sections.methods}
+- Results: ${currentArticle.sections.results}
+- Discussion: ${currentArticle.sections.discussion}
+
+Candidate's Translation:
+${JSON.stringify(transObj, null, 2)}
+
+Candidate's Exam Answers:
+- ${currentArticle.questions.q1}: ${q1 || '(未作答)'}
+- ${currentArticle.questions.q2}: ${q2 || '(未作答)'}
+- ${currentArticle.questions.q3}: ${q3 || '(未作答)'}
+
+Return strictly valid JSON with this exact structure (all feedback in Traditional Chinese):
+{
+  "totalScore": 82,
+  "dimTranslation": 80,
+  "dimStatistics": 85,
+  "dimCriticalAppraisal": 81,
+  "weaknessTags": ["生統術語精準度", "漏譯限制條件"],
+  "detailedCritique": "逐點指出中譯中的漏譯、誤譯（特別是統計數據與方法學名詞），並針對 Q1-Q3 給出陽明交大研究所高分作答指導建議。",
+  "referenceTranslations": {
+    "abstract": "Abstract 完整流暢學術中文參考譯文",
+    "introduction": "1. Introduction 完整流暢學術中文參考譯文",
+    "methods": "2. Methods 完整流暢學術中文參考譯文",
+    "results": "3. Results 完整流暢學術中文參考譯文",
+    "discussion": "4. Discussion 完整流暢學術中文參考譯文"
+  },
+  "questionModelAnswers": {
+    "q1": "Q1 滿分參考解析",
+    "q2": "Q2 滿分參考解析",
+    "q3": "Q3 滿分參考解析"
+  }
+}`;
+
+      try {
+        const result = await callGeminiAPI(prompt, true);
+
+        // Calculate score delta if re-attempting same article
+        const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+        const prevAttempts = history.filter(h => h.article.id === currentArticle.id);
+        let scoreDelta = null;
+        if (prevAttempts.length > 0) {
+          const lastScore = prevAttempts[0].grading.totalScore;
+          scoreDelta = result.totalScore - lastScore;
+        }
+
+        const record = {
+          id: 'rec_' + Date.now(),
+          timestamp: new Date().toISOString(),
+          article: currentArticle,
+          userTranslation: transObj,
+          userAnswers: { q1, q2, q3 },
+          grading: result,
+          scoreDelta
+        };
+
+        history.unshift(record);
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
+        updateDailyStreak();
+        updateHeaderBadges();
+        displayGradingOutput(record);
+        showToast('批改完成！作答紀錄與逐段對照解析已自動永久存檔。');
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+        lucide.createIcons();
+      }
+    }
+
+    function updateDailyStreak() {
+      const today = new Date().toISOString().slice(0, 10);
+      const streak = JSON.parse(localStorage.getItem(STORAGE_KEYS.STREAK) || '{"count":0,"lastDate":""}');
+      if (streak.lastDate !== today) {
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        streak.count = (streak.lastDate === yesterday) ? streak.count + 1 : 1;
+        streak.lastDate = today;
+        localStorage.setItem(STORAGE_KEYS.STREAK, JSON.stringify(streak));
+        document.getElementById('streakCount').textContent = streak.count;
+      }
+    }
+
+    function displayGradingOutput(record) {
+      const g = record.grading;
+      const card = document.getElementById('gradingResultCard');
+      card.classList.remove('hidden');
+
+      document.getElementById('gradeTotalScore').textContent = `${g.totalScore} 分`;
+      document.getElementById('scoreDimTrans').textContent = `${g.dimTranslation} 分`;
+      document.getElementById('scoreDimStats').textContent = `${g.dimStatistics} 分`;
+      document.getElementById('scoreDimCrit').textContent = `${g.dimCriticalAppraisal} 分`;
+
+      const deltaBadge = document.getElementById('scoreDeltaBadge');
+      if (record.scoreDelta !== null && record.scoreDelta !== undefined) {
+        deltaBadge.classList.remove('hidden');
+        const sign = record.scoreDelta >= 0 ? '+' : '';
+        deltaBadge.textContent = `較前次挑戰 ${sign}${record.scoreDelta} 分`;
+      } else {
+        deltaBadge.classList.add('hidden');
+      }
+
+      const tagsEl = document.getElementById('gradeWeaknessTags');
+      tagsEl.innerHTML = (g.weaknessTags || []).map(tag =>
+        `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"># ${tag}</span>`
+      ).join('');
+
+      document.getElementById('gradeFeedbackText').textContent = g.detailedCritique;
+
+      const secKeys = [
+        { k: 'abstract', title: 'Abstract 摘要' },
+        { k: 'introduction', title: '1. Introduction 前言' },
+        { k: 'methods', title: '2. Methods 研究方法' },
+        { k: 'results', title: '3. Results 研究結果' },
+        { k: 'discussion', title: '4. Discussion 討論與臨床應用' }
+      ];
+
+      const refContainer = document.getElementById('bilingualReferenceList');
+      let html = secKeys.map(s => `
+        <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+          <div class="bg-slate-100 px-3.5 py-1.5 font-bold text-slate-700">${s.title}</div>
+          <div class="p-3.5 grid grid-cols-1 md:grid-cols-2 gap-3 bg-white">
+            <div class="text-slate-600 academic-text leading-relaxed border-b md:border-b-0 md:border-r border-slate-100 pb-2 md:pb-0 md:pr-3">${record.article.sections[s.k]}</div>
+            <div class="text-slate-900 leading-relaxed font-medium">${g.referenceTranslations?.[s.k] || ''}</div>
+          </div>
+        </div>
+      `).join('');
+
+      if (g.questionModelAnswers) {
+        html += `
+          <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 space-y-2 text-xs">
+            <div class="font-bold text-indigo-900 text-sm">研究所申論題滿分參考解析</div>
+            <div><strong class="text-indigo-800">Q1 解析：</strong>${g.questionModelAnswers.q1}</div>
+            <div><strong class="text-indigo-800">Q2 解析：</strong>${g.questionModelAnswers.q2}</div>
+            <div><strong class="text-indigo-800">Q3 解析：</strong>${g.questionModelAnswers.q3}</div>
+          </div>
+        `;
+      }
+      refContainer.innerHTML = html;
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ==================== HISTORY TAB RENDERING ====================
+    function renderHistoryList() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      const filter = document.getElementById('historyFilterScore').value;
+      const filtered = history.filter(h => {
+        const s = h.grading?.totalScore || 0;
+        if (filter === 'high') return s >= 80;
+        if (filter === 'mid') return s >= 65 && s < 80;
+        if (filter === 'low') return s < 65;
+        return true;
+      });
+
+      const container = document.getElementById('historyListContainer');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-10 text-center text-sm text-slate-500 border border-slate-200">目前尚無符合條件的歷史作答紀錄，快去完成今日實證文獻練習吧！</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(rec => {
+        const dateStr = new Date(rec.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const score = rec.grading.totalScore;
+        const scoreColor = score >= 80 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (score >= 65 ? 'text-sky-600 bg-sky-50 border-sky-200' : 'text-rose-600 bg-rose-50 border-rose-200');
+        const sharedTag = rec.sharedBy ? `<span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[11px] font-bold">戰友分享：${rec.sharedBy}</span>` : '';
+
+        return `
+          <div onclick="openHistoryDetail('${rec.id}')" class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-sky-400 shadow-sm cursor-pointer transition flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-xs text-slate-400 font-mono">${dateStr} • ${rec.article.journal}</span>
+                <div class="flex items-center gap-1.5">
+                  ${sharedTag}
+                  <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold border ${scoreColor}">${score} 分</span>
+                </div>
+              </div>
+              <h3 class="font-bold text-slate-900 text-sm line-clamp-2">${rec.article.title}</h3>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
+              <span>翻譯 ${rec.grading.dimTranslation}｜統計 ${rec.grading.dimStatistics}｜評讀 ${rec.grading.dimCriticalAppraisal}</span>
+              <span class="text-sky-600 font-semibold">點擊雙欄重溫 →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openHistoryDetail(recId) {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      const rec = history.find(h => h.id === recId);
+      if (!rec) return;
+      activeHistoryRecord = rec;
+
+      const panel = document.getElementById('historyDetailPanel');
+      panel.classList.remove('hidden');
+      document.getElementById('histDetailMeta').textContent = `${new Date(rec.timestamp).toLocaleString('zh-TW')}｜總分 ${rec.grading.totalScore} 分`;
+      document.getElementById('histDetailTitle').textContent = rec.article.title;
+
+      const userTransText = rec.userTranslation.mode === 'full'
+        ? rec.userTranslation.fullText
+        : Object.entries(rec.userTranslation).filter(([k]) => k !== 'mode').map(([k, v]) => `【${k.toUpperCase()}】
+${v || '(未填寫)'}`).join('
+
+');
+
+      document.getElementById('histDetailBody').innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+            <h4 class="text-xs font-bold text-slate-700 mb-2">作答者中文翻譯紀錄</h4>
+            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${userTransText || '(無翻譯紀錄)'}</div>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
+            <h4 class="font-bold text-slate-700">考題作答紀錄</h4>
+            <div><strong>Q1：</strong>${rec.userAnswers.q1 || '(未作答)'}</div>
+            <div><strong>Q2：</strong>${rec.userAnswers.q2 || '(未作答)'}</div>
+            <div><strong>Q3：</strong>${rec.userAnswers.q3 || '(未作答)'}</div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-amber-50/70 rounded-xl p-4 border border-amber-200">
+            <h4 class="text-xs font-bold text-amber-900 mb-2">AI 指導教授評語</h4>
+            <div class="text-xs text-slate-800 whitespace-pre-line leading-relaxed">${rec.grading.detailedCritique}</div>
+          </div>
+          <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200 space-y-2 text-xs">
+            <h4 class="font-bold text-emerald-900">參考中譯摘要與結果</h4>
+            <div><strong>Abstract：</strong>${rec.grading.referenceTranslations?.abstract || ''}</div>
+            <div><strong>Results：</strong>${rec.grading.referenceTranslations?.results || ''}</div>
+          </div>
+        </div>
+      `;
+      panel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function reattemptCurrentHistory() {
+      if (!activeHistoryRecord) return;
+      renderArticle(activeHistoryRecord.article);
+      clearCurrentAnswers();
+      switchMainTab('practice');
+      showToast('已載入該篇論文至作答區，送出後將自動計算進步分差！');
+    }
+
+    // ==================== WEEKLY REPORT TAB ====================
+    function renderWeeklyReport() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+
+      document.getElementById('wkTotalCount').textContent = `${history.length} 篇`;
+      const masteredCount = vocab.filter(v => (v.interval || 0) >= 4).length;
+      document.getElementById('wkVocabMastery').textContent = `${masteredCount} / ${vocab.length}`;
+
+      const weekAgo = Date.now() - 7 * 86400000;
+      const recent = history.filter(h => new Date(h.timestamp).getTime() >= weekAgo);
+      const targetSet = recent.length > 0 ? recent : history;
+
+      if (targetSet.length === 0) {
+        document.getElementById('wkAvgScore').textContent = '-- 分';
+        document.getElementById('wkMaxScore').textContent = '-- 分';
+        return;
+      }
+
+      const avg = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.totalScore, 0) / targetSet.length);
+      const max = Math.max(...targetSet.map(h => h.grading.totalScore));
+      const avgTrans = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimTranslation, 0) / targetSet.length);
+      const avgStats = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimStatistics, 0) / targetSet.length);
+      const avgCrit = Math.round(targetSet.reduce((acc, cur) => acc + cur.grading.dimCriticalAppraisal, 0) / targetSet.length);
+
+      document.getElementById('wkAvgScore').textContent = `${avg} 分`;
+      document.getElementById('wkMaxScore').textContent = `${max} 分`;
+
+      document.getElementById('avgDimTransText').textContent = `${avgTrans}%`;
+      document.getElementById('avgDimTransBar').style.width = `${avgTrans}%`;
+      document.getElementById('avgDimStatsText').textContent = `${avgStats}%`;
+      document.getElementById('avgDimStatsBar').style.width = `${avgStats}%`;
+      document.getElementById('avgDimCritText').textContent = `${avgCrit}%`;
+      document.getElementById('avgDimCritBar').style.width = `${avgCrit}%`;
+
+      const tagCounts = {};
+      targetSet.forEach(h => (h.grading.weaknessTags || []).forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1));
+      const cloudEl = document.getElementById('weeklyWeaknessCloud');
+      const entries = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+      cloudEl.innerHTML = entries.length > 0
+        ? entries.map(([t, c]) => `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold">${t} (${c}次)</span>`).join('')
+        : '目前表現優異，尚無高頻弱點標籤！';
+
+      const savedRx = localStorage.getItem(STORAGE_KEYS.PRESCRIPTION);
+      if (savedRx) {
+        document.getElementById('weeklyPrescriptionBox').textContent = savedRx;
+      }
+    }
+
+    async function generateWeeklyPrescription() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      if (history.length === 0) {
+        alert('請先完成至少 1 篇實證文獻練習與批改，系統才能為您診斷！');
+        return;
+      }
+      const btn = document.getElementById('btnGenWeekly');
+      btn.disabled = true;
+      btn.textContent = 'AI 教授正在分析您的學習軌跡...';
+
+      const summaryData = history.slice(0, 10).map(h => ({
+        title: h.article.title,
+        score: h.grading.totalScore,
+        dims: [h.grading.dimTranslation, h.grading.dimStatistics, h.grading.dimCriticalAppraisal],
+        tags: h.grading.weaknessTags
+      }));
+
+      const prompt = `你是陽明交通大學護理研究所指導教授。請根據考生近期的實證醫學英文讀題與翻譯表現數據，撰寫一份具體、溫暖且具實戰價值的「每週學習診斷與下週訓練處方箋」（繁體中文，約 250–350 字，包含：1. 本週優勢肯定、2. 核心失分盲點剖析、3. 下週每日 30 分鐘具體練習處方）：
+數據：${JSON.stringify(summaryData)}`;
+
+      try {
+        const rx = await callGeminiAPI(prompt, false);
+        localStorage.setItem(STORAGE_KEYS.PRESCRIPTION, rx);
+        document.getElementById('weeklyPrescriptionBox').textContent = rx;
+        showToast('已生成並儲存本週 AI 改善處方箋！');
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="stethoscope" class="w-4 h-4"></i> 生成本週 AI 改善處方箋`;
+        lucide.createIcons();
+      }
+    }
+
+    // ==================== VOCABULARY NOTEBOOK & SRS SYSTEM ====================
+    function setupSelectionListener() {
+      document.addEventListener('mouseup', (e) => {
+        const toolbar = document.getElementById('selectionToolbar');
+        if (toolbar.contains(e.target)) return;
+
+        const sel = window.getSelection();
+        const text = sel ? sel.toString().trim() : '';
+        if (text && text.length >= 2 && text.length <= 60 && /[a-zA-Z]/.test(text)) {
+          selectedTextCache = text;
+          document.getElementById('selectedWordPreview').textContent = text;
+          toolbar.style.left = `${Math.min(window.innerWidth - 140, Math.max(140, e.clientX))}px`;
+          toolbar.style.top = `${Math.max(60, e.clientY - 48)}px`;
+          toolbar.classList.remove('hidden');
+          lucide.createIcons();
+        } else {
+          toolbar.classList.add('hidden');
+        }
+      });
+    }
+
+    function showTermHelper(termKey) {
+      const info = currentArticle.terms?.[termKey];
+      if (!info) return;
+      activeTermObj = { word: termKey, pos: info.pos, def: info.def };
+      document.getElementById('termHelperWord').textContent = termKey;
+      document.getElementById('termHelperPos').textContent = info.pos;
+      document.getElementById('termHelperDef').textContent = info.def;
+      document.getElementById('termHelperBox').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function speakCurrentTerm() {
+      if (activeTermObj) speakText(activeTermObj.word);
+    }
+
+    function addCurrentTermToVocab() {
+      if (!activeTermObj) return;
+      saveWordToStorage({
+        word: activeTermObj.word,
+        pos: activeTermObj.pos,
+        def: activeTermObj.def,
+        context: currentArticle.title
+      });
+    }
+
+    async function quickSaveSelection(useAI) {
+      const word = selectedTextCache;
+      document.getElementById('selectionToolbar').classList.add('hidden');
+      if (!word) return;
+
+      if (!useAI) {
+        saveWordToStorage({
+          word,
+          pos: 'term',
+          def: '（待補充釋義 — 可於單字本點擊 AI 補全）',
+          context: currentArticle.title
+        });
+        return;
+      }
+
+      showToast(`正在呼叫 AI 查詢「${word}」的實證醫學釋義...`);
+      try {
+        const info = await fetchWordDefinitionAI(word, currentArticle.title);
+        saveWordToStorage({
+          word,
+          pos: info.pos || 'term',
+          def: info.def,
+          context: info.example || currentArticle.title
+        });
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function manualAddVocab() {
+      const wordInp = document.getElementById('newVocabWord');
+      const defInp = document.getElementById('newVocabManualDef');
+      const word = wordInp.value.trim();
+      const manualDef = defInp.value.trim();
+      if (!word) return;
+
+      const btn = document.getElementById('btnAddVocab');
+      btn.disabled = true;
+
+      try {
+        if (manualDef) {
+          saveWordToStorage({ word, pos: 'term', def: manualDef, context: '手動新增筆記' });
+        } else {
+          showToast(`AI 正在解析「${word}」的護理研究所考場釋義...`);
+          const info = await fetchWordDefinitionAI(word, currentArticle.title);
+          saveWordToStorage({
+            word,
+            pos: info.pos || 'term',
+            def: info.def,
+            context: info.example || currentArticle.title
+          });
+        }
+        wordInp.value = '';
+        defInp.value = '';
+        renderVocabList();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function fetchWordDefinitionAI(word, contextTitle) {
+      const prompt = `Explain the English medical/biostatistical term "${word}" in the context of nursing & Evidence-Based Medicine (Article: "${contextTitle}").
+Return strictly valid JSON:
+{
+  "pos": "n. / v. / adj. / phrase",
+  "def": "簡潔精準的繁體中文實證醫學與生統釋義（含考場翻譯要點）",
+  "example": "一句簡短實用的臨床實證英文例句"
+}`;
+      return await callGeminiAPI(prompt, true);
+    }
+
+    function saveWordToStorage(item) {
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      const idx = vocab.findIndex(v => v.word.toLowerCase() === item.word.toLowerCase());
+      const now = Date.now();
+      if (idx >= 0) {
+        vocab[idx] = { ...vocab[idx], ...item };
+        showToast(`已更新單字「${item.word}」的釋義！`);
+      } else {
+        vocab.unshift({
+          id: 'voc_' + now,
+          word: item.word,
+          pos: item.pos || 'term',
+          def: item.def,
+          context: item.context || '',
+          interval: 0,
+          nextReview: now,
+          addedAt: new Date().toISOString()
+        });
+        showToast(`已將「${item.word}」收入我的醫學單字本！`);
+      }
+      localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(vocab));
+      updateHeaderBadges();
+    }
+
+    function deleteVocab(id) {
+      let vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      vocab = vocab.filter(v => v.id !== id);
+      localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(vocab));
+      updateHeaderBadges();
+      renderVocabList();
+    }
+
+    function filterVocabList(filter) {
+      vocabFilter = filter;
+      document.querySelectorAll('.vfilter-btn').forEach(b => {
+        b.className = b.dataset.vf === filter
+          ? 'vfilter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white'
+          : 'vfilter-btn px-3 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700';
+      });
+      renderVocabList();
+    }
+
+    function renderVocabList() {
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      const now = Date.now();
+      const filtered = vocab.filter(v => {
+        if (vocabFilter === 'due') return (v.nextReview || 0) <= now;
+        if (vocabFilter === 'learning') return (v.interval || 0) < 4;
+        if (vocabFilter === 'mastered') return (v.interval || 0) >= 4;
+        return true;
+      });
+
+      const grid = document.getElementById('vocabGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-10 text-center text-sm text-slate-500 border border-slate-200">此分類目前沒有單字。閱讀英文文獻時用滑鼠反白單字即可一鍵收錄！</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(v => {
+        const isMastered = (v.interval || 0) >= 4;
+        const statusBadge = isMastered
+          ? `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-bold">已精熟</span>`
+          : `<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">待複習</span>`;
+
+        return `
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-bold text-base text-slate-900">${v.word}</h4>
+                  <span class="text-xs text-sky-600 font-semibold">${v.pos}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  ${statusBadge}
+                  <button onclick="speakText('${v.word.replace(/'/g, "\'")}')" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600" title="美式發音">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                  </button>
+                  <button onclick="deleteVocab('${v.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600" title="刪除">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-sm text-slate-800 font-medium mt-2 leading-snug">${v.def}</p>
+            </div>
+            <div class="text-[11px] text-slate-400 italic border-t border-slate-100 pt-2 line-clamp-2">
+              ${v.context || ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function setVocabSubMode(mode) {
+      ['list', 'flashcard', 'quiz'].forEach(m => {
+        document.getElementById(`vocab-sub-${m}`).classList.toggle('hidden', m !== mode);
+        document.getElementById(`vmode-${m}`).className = m === mode
+          ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white transition'
+          : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+      });
+      if (mode === 'list') renderVocabList();
+      if (mode === 'flashcard') initFlashcards();
+      if (mode === 'quiz') initVocabQuiz();
+    }
+
+    // Flashcard SRS
+    function initFlashcards() {
+      fcIndex = 0;
+      loadFlashcardItem();
+    }
+
+    function loadFlashcardItem() {
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      document.getElementById('fcInner').classList.remove('rotate-y-180');
+      if (vocab.length === 0) {
+        document.getElementById('fcCounter').textContent = '0 / 0';
+        document.getElementById('fcFrontWord').textContent = '單字庫尚無生字';
+        document.getElementById('fcBackDef').textContent = '請先在閱讀區反白收錄單字';
+        document.getElementById('fcBackContext').textContent = '';
+        return;
+      }
+      if (fcIndex >= vocab.length) fcIndex = 0;
+      const item = vocab[fcIndex];
+      document.getElementById('fcCounter').textContent = `${fcIndex + 1} / ${vocab.length}`;
+      document.getElementById('fcPosBadge').textContent = item.pos || 'term';
+      document.getElementById('fcFrontWord').textContent = item.word;
+      document.getElementById('fcBackDef').textContent = item.def;
+      document.getElementById('fcBackContext').textContent = item.context || '';
+    }
+
+    function flipFlashcard() {
+      document.getElementById('fcInner').classList.toggle('rotate-y-180');
+    }
+
+    function rateFlashcard(level) {
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      if (vocab.length === 0) return;
+      const item = vocab[fcIndex];
+      const dayMs = 86400000;
+      if (level === 'hard') {
+        item.interval = 0;
+        item.nextReview = Date.now();
+      } else if (level === 'good') {
+        item.interval = 1;
+        item.nextReview = Date.now() + dayMs;
+      } else {
+        item.interval = 4;
+        item.nextReview = Date.now() + 4 * dayMs;
+      }
+      localStorage.setItem(STORAGE_KEYS.VOCAB, JSON.stringify(vocab));
+      updateHeaderBadges();
+      fcIndex = (fcIndex + 1) % vocab.length;
+      loadFlashcardItem();
+    }
+
+    // Multiple Choice Quiz
+    function initVocabQuiz() {
+      quizStats = { correct: 0, total: 0, currentAnswer: '' };
+      nextQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      const feedbackEl = document.getElementById('quizFeedback');
+      feedbackEl.classList.add('hidden');
+      document.getElementById('quizScoreBadge').textContent = `得分：${quizStats.correct} / ${quizStats.total}`;
+
+      if (vocab.length < 4) {
+        document.getElementById('quizQuestionWord').textContent = '請先收錄至少 4 個單字以啟動四選一測驗';
+        document.getElementById('quizOptions').innerHTML = '';
+        return;
+      }
+
+      const target = vocab[Math.floor(Math.random() * vocab.length)];
+      quizStats.currentAnswer = target.def;
+      document.getElementById('quizQuestionWord').textContent = target.word;
+
+      const distractors = vocab.filter(v => v.id !== target.id).sort(() => 0.5 - Math.random()).slice(0, 3).map(v => v.def);
+      const options = [target.def, ...distractors].sort(() => 0.5 - Math.random());
+
+      document.getElementById('quizOptions').innerHTML = options.map(opt => `
+        <button onclick="checkQuizOption(this, '${opt.replace(/'/g, "\'")}')" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:bg-sky-50/50 text-xs font-medium text-slate-800 transition">
+          ${opt}
+        </button>
+      `).join('');
+    }
+
+    function checkQuizOption(btn, chosen) {
+      const feedbackEl = document.getElementById('quizFeedback');
+      if (!feedbackEl.classList.contains('hidden')) return;
+      quizStats.total++;
+      const isCorrect = chosen === quizStats.currentAnswer;
+      if (isCorrect) {
+        quizStats.correct++;
+        btn.className = 'w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-xs font-bold text-emerald-900';
+        feedbackEl.className = 'text-center text-xs font-bold py-2 rounded-xl bg-emerald-100 text-emerald-800';
+        feedbackEl.textContent = '答對了！完全掌握該實證詞彙釋義。';
+      } else {
+        btn.className = 'w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-xs font-bold text-rose-900';
+        feedbackEl.className = 'text-center text-xs font-bold py-2 rounded-xl bg-rose-100 text-rose-800';
+        feedbackEl.textContent = `答錯囉！正確釋義為：${quizStats.currentAnswer}`;
+      }
+      feedbackEl.classList.remove('hidden');
+      document.getElementById('quizScoreBadge').textContent = `得分：${quizStats.correct} / ${quizStats.total}`;
+    }
+
+    // ==================== NAVIGATION & UTILITIES ====================
+    function switchMainTab(tabName) {
+      ['practice', 'history', 'weekly', 'vocab'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tabName);
+        const btn = document.getElementById(`tab-${t}`);
+        btn.className = t === tabName
+          ? 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white flex items-center gap-1.5 transition'
+          : 'nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 flex items-center gap-1.5 transition';
+      });
+      if (tabName === 'history') renderHistoryList();
+      if (tabName === 'weekly') renderWeeklyReport();
+      if (tabName === 'vocab') renderVocabList();
+      lucide.createIcons();
+    }
+
+    function updateHeaderBadges() {
+      const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+      const vocab = JSON.parse(localStorage.getItem(STORAGE_KEYS.VOCAB) || '[]');
+      const dueCount = vocab.filter(v => (v.nextReview || 0) <= Date.now()).length;
+
+      document.getElementById('historyCountBadge').textContent = history.length;
+      document.getElementById('dueVocabBadge').textContent = dueCount;
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = 0.92;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.add('hidden'), 3600);
+    }
+  </script>
+</body>
+</html>
